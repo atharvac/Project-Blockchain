@@ -1,2 +1,4 @@
-public class Block {
+class Block {
+    String hash;
+    String prevHash;
 }
