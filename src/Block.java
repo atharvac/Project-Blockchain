@@ -18,6 +18,7 @@ class Block {
 
     // Import or implement hash function SHA256 or any other.
     // Returns a Hex Hash value
+    //testing
     String calcHash(){
         return "";
     }
