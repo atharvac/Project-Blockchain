@@ -1,7 +1,8 @@
 import java.util.ArrayList;
 
-public class Blockchain {
+class Blockchain {
     ArrayList<Block> chain;
+    ArrayList<Transaction> pendingTransactions;
     private int difficulty = 0;
 
     void setDifficulty(int diff){
