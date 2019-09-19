@@ -22,7 +22,7 @@ class Block {
     // Returns a Hex Hash value
     String calcHash() throws NoSuchAlgorithmException {
 
-        String msg = String.valueOf(blockId + prevHash + String.valueOf(time) + hash);
+        String msg = String.valueOf(blockId + String.valueOf(time) + transactions.size());
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] bytes = digest.digest(msg.getBytes());
