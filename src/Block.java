@@ -11,11 +11,12 @@ class Block {
     private String time;
     private int difficulty;
     int nonce;
-    Block(String preH, ArrayList<Transaction> tr, String time, int difficulty){
+    Block(String preH, ArrayList<Transaction> tr, String time, int difficulty) throws NoSuchAlgorithmException {
         this.prevHash = preH;
         this.transactions = tr;
         this.time = time;
         this.difficulty = difficulty;
+        this.hash = calcHash();
     }
 
     // Import or implement hash function SHA256 or any other.
@@ -37,7 +38,7 @@ class Block {
         return hexString.toString();
     }
 
-    public String getCurrentHash(){
+    String getCurrentHash(){
         return hash;
     }
     public String getPrevHash(){

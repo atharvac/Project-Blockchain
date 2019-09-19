@@ -29,8 +29,17 @@ class Blockchain {
         this.chain.add(bk);
     }
 
-    boolean isValid(){
+    boolean isValid() throws NoSuchAlgorithmException {
         // Checks for the validity of the block-chain.
+        for (int i = chain.size()-1; i>0; i--){
+            if (chain.get(i).getCurrentHash().equals(chain.get(i).calcHash())){
+                return false;
+            }
+
+            if ((!chain.get(i).getPrevHash().equals(chain.get(i-1).calcHash()))){
+                return false;
+            }
+        }
         return true;
     }
 
