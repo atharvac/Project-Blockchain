@@ -1,5 +1,7 @@
-import java.util.ArrayList;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+
 
 class Block {
     static int blockId;
@@ -18,8 +20,21 @@ class Block {
 
     // Import or implement hash function SHA256 or any other.
     // Returns a Hex Hash value
-    String calcHash(){
-        return "";
+    String calcHash() throws NoSuchAlgorithmException {
+
+        String msg = String.valueOf(blockId + prevHash + String.valueOf(time) + hash);
+
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        final byte[] bytes = digest.digest(msg.getBytes());
+        final StringBuilder hexString = new StringBuilder();
+        for(final byte b :bytes){
+            String hex = Integer.toHexString(0xff &b);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
     public String getCurrentHash(){
