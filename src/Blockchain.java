@@ -30,13 +30,23 @@ class Blockchain {
     }
 
     boolean isValid() throws NoSuchAlgorithmException {
+        String hashTarget = new String(new char[difficulty]);
+
         // Checks for the validity of the block-chain.
         for (int i = chain.size()-1; i>0; i--){
+            //Compare current registered hash and calculated hash
             if (chain.get(i).getCurrentHash().equals(chain.get(i).calcHash())){
                 return false;
             }
 
+            //Compare previous registered hash and previous hash
             if ((!chain.get(i).getPrevHash().equals(chain.get(i-1).calcHash()))){
+                return false;
+            }
+
+            //To check is block is mined
+            if (!chain.get(i).getCurrentHash().substring(0,difficulty).equals(hashTarget)){
+                System.out.println("Block" + i +"is not Mined");
                 return false;
             }
         }
