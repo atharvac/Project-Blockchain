@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
@@ -8,10 +9,10 @@ class Blockchain {
 
     public Blockchain() throws NoSuchAlgorithmException {
         chain = new ArrayList<>();
-        chain.add(generateFirstBlock());
+        chain.add(generateGenesisBlock());
     }
 
-    private Block generateFirstBlock() throws NoSuchAlgorithmException {
+    private Block generateGenesisBlock() throws NoSuchAlgorithmException {
         Block generate = new Block("null",pendingTransactions,"27/05/1999",difficulty);
         generate.setPrevHash(null);
         generate.calcHash();

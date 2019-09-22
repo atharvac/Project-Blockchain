@@ -1,16 +1,17 @@
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 
-class Block {
+class Block implements Serializable {
     static int blockId;
     private String hash;
     private String prevHash;
     private ArrayList<Transaction> transactions;
     private String time;
     private int difficulty;
-    int nonce = 0000;
+    int nonce;
     Block(String preH, ArrayList<Transaction> tr, String time, int difficulty) throws NoSuchAlgorithmException {
         this.prevHash = preH;
         this.transactions = tr;
