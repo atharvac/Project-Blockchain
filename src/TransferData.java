@@ -1,11 +1,12 @@
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.*;
 
 //Create a transfer-data object then pass it to SendData to broadcast it.
 //This will also receive all the Traffic from ReceiveData class.
-class TransferData{
+class TransferData implements Serializable {
     //Header determines how the broadcast is handled at the receiver's end
     private String header;
     private String senderID;
