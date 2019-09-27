@@ -10,21 +10,22 @@ class TransferData implements Serializable {
     private String type;
     private Block b;
     private Transaction t;
-    TransferData(String head, String ID, Block b){
+    TransferData(String head, String ID, Block b){// Constructor for block broadcast.
         header = head;
         senderID = ID;
         this.b = b;
     }
-    TransferData(String head, String ID, Transaction t){
+    TransferData(String head, String ID, Transaction t){// Constructor for Transaction broadcast.
         header = head;
         senderID = ID;
         this.t = t;
     }
-    TransferData(String head, String ID, String type){
+    TransferData(String head, String ID, String type){// Constructor for any other broadcast.
         header = head;
         senderID = ID;
         this.type = type;
     }
+    // Getter methods
     String getHeader(){
         return this.header;
     }
@@ -45,13 +46,13 @@ class TransferData implements Serializable {
 //For all broadcast purposes (Block, Transaction, Request)
 class SendData {
 
-    private DatagramSocket socketBroadcast;//Broadcast socket
-    private InetAddress address;
-    private int port;
+    private DatagramSocket socketBroadcast;// Broadcast socket
+    private InetAddress address;// Set the subnet.
+    private int port;// Set the port to which to broadcast.
     SendData(String addr, int port){
         try {
             socketBroadcast = new DatagramSocket();
-            socketBroadcast.setBroadcast(true);
+            socketBroadcast.setBroadcast(true);// Set broadcast to true
             address = InetAddress.getByName(addr);
             this.port = port;
         } catch (IOException e) {
@@ -64,62 +65,71 @@ class SendData {
     void broadcastData(TransferData t) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(6400);
         final ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(t);
+        oos.writeObject(t);// Write object to byteStream
         oos.flush();
-        byte [] data = baos.toByteArray();
+        byte [] data = baos.toByteArray();// Serialize
 
-        DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+        DatagramPacket packet = new DatagramPacket(data, data.length, address, port);// Create a UDP packet
+        socketBroadcast.send(packet);// Send the packet
+        // End the broadcast
+        endBroadcast();
+    }
+
+    private void endBroadcast() throws IOException{
+        byte [] buf;
+        buf = "end".getBytes();
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
         socketBroadcast.send(packet);
         socketBroadcast.close();
     }
 
 }
 
+
 class ReceiveData extends Thread {
-    String header;
     private InetAddress address;
     private int port;
     private boolean running;
     DatagramSocket socket;
     byte[] buf = new byte[1024];
 
-    ReceiveData(int port) throws SocketException {
+    ReceiveData(int port, Blockchain chain) throws SocketException {
         this.port = port;
-        socket = new DatagramSocket(port);
+        socket = new DatagramSocket(port);// Set port on socket
         System.out.println("Server is listening on port:" + port);
     }
 
-    public void run() {
+    public void run() {// Thread start() method calls this method.
         running = true;
         String received = "";
         boolean flag = false;
         while (running) {
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);// Create a UDP packet (empty).
             try {
-                socket.receive(packet);
+                socket.receive(packet);// Receive the packet.
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            InetAddress address = packet.getAddress();
+            InetAddress address = packet.getAddress();// Get the broadcaster.
             int port = packet.getPort();
             if(flag){
                 received = new String(packet.getData(), 0, packet.getLength());
-                System.out.println(received);
-
-
+                System.out.println("Received " + received + " From " + address.toString() + " On port:"+port);
                 if (received.equals("end")) {
                     running = false;
                     continue;
                 }
-                packet = new DatagramPacket(buf, buf.length, address, port);
+                //packet = new DatagramPacket(buf, buf.length, address, port);
                 flag = false;
             }
-            else{
-                ByteArrayInputStream bis = new ByteArrayInputStream(buf);
+            else{// CODE TO ACCEPT AND DESERIALIZE OBJECT (TransferData).
+                ByteArrayInputStream bis = new ByteArrayInputStream(buf);// Get input stream from byte array.
                 try {
-                    ObjectInputStream ois = new ObjectInputStream(bis);
-                    TransferData e1  = (TransferData) ois.readObject();
+                    ObjectInputStream ois = new ObjectInputStream(bis);// Create an object from input-stream.
+                    TransferData e1  = (TransferData) ois.readObject();// Create the specific object.
+                    //TEST CODE
+                    System.out.println(e1.getHeader() + "  " + e1.getSenderID());
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                     System.out.println("Exception" + e);

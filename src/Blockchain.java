@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
@@ -7,13 +8,14 @@ class Blockchain {
     ArrayList<Block> chain;
     ArrayList<Transaction> pendingTransactions;
     private int difficulty = 0;
-    ReceiveData server;
+    String ID;
 
-    public Blockchain() throws NoSuchAlgorithmException, SocketException {
+    public Blockchain(String ID) throws NoSuchAlgorithmException, SocketException {
+        this.ID = ID;
         chain = new ArrayList<>();
         pendingTransactions = new ArrayList<>();
         chain.add(generateGenesisBlock());
-        server = new ReceiveData(7777);
+
     }
 
     private Block generateGenesisBlock() throws NoSuchAlgorithmException {
@@ -58,11 +60,20 @@ class Blockchain {
         return true;
     }
 
-    public static void main(String[] args) throws SocketException, NoSuchAlgorithmException {
-        Blockchain bc = new Blockchain();
-        Thread t1 = new Thread(bc.server);
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+
+        //
+        //TEST CODE
+        //
+        String ID = String.valueOf((int) (Math.random() * 100000));
+        Blockchain b_chain = new Blockchain(ID);
+        ReceiveData server = new ReceiveData(7777, b_chain);
+        TransferData td = new TransferData("Block1", b_chain.ID, "Test");
+        Thread t1 = new Thread(server);
         t1.start();
-        System.out.println("Block-chain!");
+        System.out.println("\nClient:");
+        SendData sd = new SendData("localhost", 7777);
+        sd.broadcastData(td);
     }
 }
 
