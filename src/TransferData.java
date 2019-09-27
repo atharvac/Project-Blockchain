@@ -10,13 +10,13 @@ class TransferData implements Serializable {
     private String type;
     private Block b;
     private Transaction t;
-    TransferData(String head, String ID, Block b){// Constructor for block broadcast.
-        header = head;
+    TransferData(String ID, Block b){// Constructor for block broadcast.
+        header = "Block";
         senderID = ID;
         this.b = b;
     }
-    TransferData(String head, String ID, Transaction t){// Constructor for Transaction broadcast.
-        header = head;
+    TransferData(String ID, Transaction t){// Constructor for Transaction broadcast.
+        header = "Transaction";
         senderID = ID;
         this.t = t;
     }
@@ -71,11 +71,9 @@ class SendData {
 
         DatagramPacket packet = new DatagramPacket(data, data.length, address, port);// Create a UDP packet
         socketBroadcast.send(packet);// Send the packet
-        // End the broadcast
-        endBroadcast();
     }
 
-    private void endBroadcast() throws IOException{
+     void endBroadcast() throws IOException{
         byte [] buf;
         buf = "end".getBytes();
         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
@@ -91,12 +89,37 @@ class ReceiveData extends Thread {
     private int port;
     private boolean running;
     DatagramSocket socket;
+    Blockchain b_chain;
     byte[] buf = new byte[1024];
 
     ReceiveData(int port, Blockchain chain) throws SocketException {
         this.port = port;
         socket = new DatagramSocket(port);// Set port on socket
+        this.b_chain = chain;
         System.out.println("Server is listening on port:" + port);
+
+    }
+
+
+    // Check headers from transmissions and perform certain actions.
+    void checkHeaders(TransferData t) {
+        switch(t.getHeader()){
+            case "Block":
+                b_chain.chain.add(t.getBlock());
+                System.out.println("Block added!");
+                break;
+            case "Transaction":
+                b_chain.pendingTransactions.add(t.getTransaction());
+                System.out.println("Transaction Added");
+                break;
+            case "ChainLength":
+                if (Integer.parseInt(t.getType()) > b_chain.chain.size()){
+                    break;
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     public void run() {// Thread start() method calls this method.
@@ -113,7 +136,7 @@ class ReceiveData extends Thread {
 
             InetAddress address = packet.getAddress();// Get the broadcaster.
             int port = packet.getPort();
-            if(flag){
+            /*if(flag){
                 received = new String(packet.getData(), 0, packet.getLength());
                 System.out.println("Received " + received + " From " + address.toString() + " On port:"+port);
                 if (received.equals("end")) {
@@ -122,21 +145,25 @@ class ReceiveData extends Thread {
                 }
                 //packet = new DatagramPacket(buf, buf.length, address, port);
                 flag = false;
+            }*/
+            // CODE TO ACCEPT AND DESERIALIZE OBJECT (TransferData).
+            ByteArrayInputStream bis = new ByteArrayInputStream(buf);// Get input stream from byte array.
+            try {
+                ObjectInputStream ois = new ObjectInputStream(bis);// Create an object from input-stream.
+                TransferData e1  = (TransferData) ois.readObject();// Create the specific object.
+                checkHeaders(e1);
+                //TEST CODE
+                System.out.println(e1.getHeader() + "  " + e1.getSenderID());
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                System.out.println("Exception" + e);
             }
-            else{// CODE TO ACCEPT AND DESERIALIZE OBJECT (TransferData).
-                ByteArrayInputStream bis = new ByteArrayInputStream(buf);// Get input stream from byte array.
-                try {
-                    ObjectInputStream ois = new ObjectInputStream(bis);// Create an object from input-stream.
-                    TransferData e1  = (TransferData) ois.readObject();// Create the specific object.
-                    //TEST CODE
-                    System.out.println(e1.getHeader() + "  " + e1.getSenderID());
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                    System.out.println("Exception" + e);
-                }
-                flag = true;
-            }
+            //flag = true;
         }
         socket.close();
+    }
+
+    public void stopRunning(){
+        running = false;
     }
 }

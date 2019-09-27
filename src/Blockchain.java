@@ -9,10 +9,11 @@ class Blockchain implements Serializable {
     private int difficulty = 0;
     String ID;
 
-    public Blockchain(String ID) throws NoSuchAlgorithmException, SocketException {
+    public Blockchain(String ID, int diff) throws NoSuchAlgorithmException, SocketException {
         this.ID = ID;
         chain = new ArrayList<>();
         pendingTransactions = new ArrayList<>();
+        setDifficulty(diff);
         chain.add(generateGenesisBlock());
 
     }
@@ -29,8 +30,8 @@ class Blockchain implements Serializable {
 
     void add(Block bk) throws NoSuchAlgorithmException {
         // Addition code for a new block
-
-        bk.setPrevHash(chain.get((int) (chain.size()-1.)).getCurrentHash());
+        // Might need to check if prev hash == bk prev hash
+        bk.setPrevHash(chain.get((int) (chain.size()-1.)).getCurrentHash());//This should be in mining code.
         bk.calcHash();
         this.chain.add(bk);
     }
