@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
@@ -6,10 +7,13 @@ class Blockchain {
     ArrayList<Block> chain;
     ArrayList<Transaction> pendingTransactions;
     private int difficulty = 0;
+    ReceiveData server;
 
-    public Blockchain() throws NoSuchAlgorithmException {
+    public Blockchain() throws NoSuchAlgorithmException, SocketException {
         chain = new ArrayList<>();
+        pendingTransactions = new ArrayList<>();
         chain.add(generateGenesisBlock());
+        server = new ReceiveData(7777);
     }
 
     private Block generateGenesisBlock() throws NoSuchAlgorithmException {
@@ -54,7 +58,10 @@ class Blockchain {
         return true;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SocketException, NoSuchAlgorithmException {
+        Blockchain bc = new Blockchain();
+        Thread t1 = new Thread(bc.server);
+        t1.start();
         System.out.println("Block-chain!");
     }
 }

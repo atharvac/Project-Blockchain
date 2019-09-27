@@ -1,7 +1,4 @@
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.*;
 
 //Create a transfer-data object then pass it to SendData to broadcast it.
@@ -60,7 +57,7 @@ class SendData {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Connect all clients");
+        System.out.println("Broadcasting to:"+ addr);
     }
 
     //Method to broadcast the TransferData object.
@@ -78,13 +75,58 @@ class SendData {
 
 }
 
-class ReceiveData {
+class ReceiveData extends Thread {
     String header;
     private InetAddress address;
     private int port;
+    private boolean running;
+    DatagramSocket socket;
+    byte[] buf = new byte[1024];
 
-    ReceiveData(int port){
+    ReceiveData(int port) throws SocketException {
         this.port = port;
-        System.out.println("Connect all clients");
+        socket = new DatagramSocket(port);
+        System.out.println("Server is listening on port:" + port);
+    }
+
+    public void run() {
+        running = true;
+        String received = "";
+        boolean flag = false;
+        while (running) {
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            try {
+                socket.receive(packet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            InetAddress address = packet.getAddress();
+            int port = packet.getPort();
+            if(flag){
+                received = new String(packet.getData(), 0, packet.getLength());
+                System.out.println(received);
+
+
+                if (received.equals("end")) {
+                    running = false;
+                    continue;
+                }
+                packet = new DatagramPacket(buf, buf.length, address, port);
+                flag = false;
+            }
+            else{
+                ByteArrayInputStream bis = new ByteArrayInputStream(buf);
+                try {
+                    ObjectInputStream ois = new ObjectInputStream(bis);
+                    TransferData e1  = (TransferData) ois.readObject();
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                    System.out.println("Exception" + e);
+                }
+                flag = true;
+            }
+        }
+        socket.close();
     }
 }
