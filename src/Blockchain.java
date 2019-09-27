@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-class Blockchain {
+class Blockchain implements Serializable {
     ArrayList<Block> chain;
     ArrayList<Transaction> pendingTransactions;
     private int difficulty = 0;

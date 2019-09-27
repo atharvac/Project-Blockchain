@@ -2,8 +2,8 @@ import java.io.Serializable;
 import java.sql.*;
 
 class Transaction implements Serializable {
-    int fromAddress;
-    int toAddress;
+    String fromAddress; // Both of these addresses will be blockchain ID's.
+    String toAddress;
     String digital_signature;
     int id;
     float amount;
