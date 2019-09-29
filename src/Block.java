@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 
 class Block implements Serializable {
-    static int blockId;
+    int blockId;
     private String hash;
     private String prevHash;
     private ArrayList<Transaction> transactions;
@@ -13,6 +13,7 @@ class Block implements Serializable {
     private int difficulty;
     int nonce;
     Block(String preH, ArrayList<Transaction> tr, String time, int difficulty) throws NoSuchAlgorithmException {
+        this.blockId = 1; //For checking in transfer. Do not set it to 0.
         this.prevHash = preH;
         this.transactions = tr;
         this.time = time;

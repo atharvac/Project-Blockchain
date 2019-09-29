@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 //Create a transfer-data object then pass it to SendData to broadcast it.
 //This will also receive all the Traffic from ReceiveData class.
@@ -73,12 +75,12 @@ class SendData {
         socketBroadcast.send(packet);// Send the packet
     }
 
-     void endBroadcast() throws IOException{
-        byte [] buf;
-        buf = "end".getBytes();
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
-        socketBroadcast.send(packet);
-        socketBroadcast.close();
+     void endBroadcast() throws IOException, NoSuchAlgorithmException {
+        ArrayList<Transaction> a = new ArrayList<>();
+        Block b = new Block("", a, "0-0-0", 0);
+        b.blockId = 0;
+        TransferData t = new TransferData("", b);
+        broadcastData(t);
     }
 
 }
@@ -105,8 +107,10 @@ class ReceiveData extends Thread {
     void checkHeaders(TransferData t) {
         switch(t.getHeader()){
             case "Block":
-                b_chain.chain.add(t.getBlock());
-                System.out.println("Block added!");
+                if (t.getBlock().blockId != 0){
+                    b_chain.chain.add(t.getBlock());
+                    System.out.println("Block added!");
+                }
                 break;
             case "Transaction":
                 b_chain.pendingTransactions.add(t.getTransaction());

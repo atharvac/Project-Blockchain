@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class MainRun {
     private int DIFFICULTY = 2;
@@ -41,7 +42,11 @@ public class MainRun {
 
     void exit() throws IOException {
         sd = new SendData("localhost", 7777);
-        sd.endBroadcast();
+        try {
+            sd.endBroadcast();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         server.stopRunning();
         try{
             FileOutputStream f = new FileOutputStream(new File("Ledger.txt"));
@@ -57,10 +62,29 @@ public class MainRun {
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+        boolean run = true;
+        Scanner sc = new Scanner(System.in);
+        MainRun m = new MainRun();
+        m.setup();
+        while(run){
+            System.out.println("\n1)Create a transaction\n2)Start Mining\n3)Exit\n:");
+            switch (sc.nextLine()){
+                case "1":
+                    Transaction tr = new Transaction();
+                    TransferData td = new TransferData(m.b_chain.ID, tr);
+                    SendData sd = new SendData("localhost", 7777);
+                    sd.broadcastData(td);
+                    break;
+                case "2":
 
-        //
-        //TEST CODE
-        //
+                    break;
+                default:
+                    m.exit();
+                    run = false;
+                    break;
+            }
+        }
+        /*
         ArrayList<Transaction> test2= new ArrayList<>();
         Block test = new Block(null, test2, "27/09/2019", 2);
         MainRun m = new MainRun();
@@ -71,5 +95,6 @@ public class MainRun {
         sd.broadcastData(td);
         System.out.println("Size is:"+m.b_chain.chain.size());
         m.exit();
+        */
     }
 }
