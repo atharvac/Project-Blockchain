@@ -128,8 +128,6 @@ class ReceiveData extends Thread {
 
     public void run() {// Thread start() method calls this method.
         running = true;
-        String received = "";
-        boolean flag = false;
         while (running) {
             DatagramPacket packet = new DatagramPacket(buf, buf.length);// Create a UDP packet (empty).
             try {
@@ -140,17 +138,6 @@ class ReceiveData extends Thread {
 
             InetAddress address = packet.getAddress();// Get the broadcaster.
             int port = packet.getPort();
-            /*if(flag){
-                received = new String(packet.getData(), 0, packet.getLength());
-                System.out.println("Received " + received + " From " + address.toString() + " On port:"+port);
-                if (received.equals("end")) {
-                    running = false;
-                    continue;
-                }
-                //packet = new DatagramPacket(buf, buf.length, address, port);
-                flag = false;
-            }*/
-            // CODE TO ACCEPT AND DESERIALIZE OBJECT (TransferData).
             ByteArrayInputStream bis = new ByteArrayInputStream(buf);// Get input stream from byte array.
             try {
                 ObjectInputStream ois = new ObjectInputStream(bis);// Create an object from input-stream.
@@ -162,7 +149,6 @@ class ReceiveData extends Thread {
                 e.printStackTrace();
                 System.out.println("Exception" + e);
             }
-            //flag = true;
         }
         socket.close();
     }

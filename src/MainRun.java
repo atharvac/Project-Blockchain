@@ -61,19 +61,23 @@ public class MainRun {
         }
     }
 
+    void makeTransaction() throws IOException {
+        Transaction tr = new Transaction();
+        TransferData td = new TransferData(b_chain.ID, tr);
+        SendData sd = new SendData("localhost", 7777);
+        sd.broadcastData(td);
+    }
+
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         boolean run = true;
         Scanner sc = new Scanner(System.in);
         MainRun m = new MainRun();
         m.setup();
         while(run){
-            System.out.println("\n1)Create a transaction\n2)Start Mining\n3)Exit\n:");
+            System.out.print("\n1)Create a transaction\n2)Start Mining\n3)Exit\n:");
             switch (sc.nextLine()){
                 case "1":
-                    Transaction tr = new Transaction();
-                    TransferData td = new TransferData(m.b_chain.ID, tr);
-                    SendData sd = new SendData("localhost", 7777);
-                    sd.broadcastData(td);
+                    m.makeTransaction();
                     break;
                 case "2":
 
@@ -96,5 +100,6 @@ public class MainRun {
         System.out.println("Size is:"+m.b_chain.chain.size());
         m.exit();
         */
+
     }
 }
