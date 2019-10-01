@@ -11,7 +11,7 @@ public class MainRun {
     public Blockchain b_chain;
     ReceiveData server;
     SendData sd;
-    private void setup() throws SocketException {
+    void setup() throws SocketException {
         File file = new File("Ledger.txt");
         if (file.exists()){
             System.out.println("Ledger Found, Using That.\n");
@@ -61,11 +61,12 @@ public class MainRun {
         }
     }
 
-    void makeTransaction() throws IOException {
+    String makeTransaction() throws IOException {
         Transaction tr = new Transaction();
         TransferData td = new TransferData(b_chain.ID, tr);
         SendData sd = new SendData("localhost", 7777);
         sd.broadcastData(td);
+        return b_chain.ID;// Here goes Transaction Information.
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
