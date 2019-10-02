@@ -64,7 +64,7 @@ public class MainRun {
     String makeTransaction() throws IOException {
         Transaction tr = new Transaction();
         TransferData td = new TransferData(b_chain.ID, tr);
-        SendData sd = new SendData("localhost", 7777);
+        SendData sd = new SendData("192.168.0.255", 7777);
         sd.broadcastData(td);
         return b_chain.ID;// Here goes Transaction Information.
     }
