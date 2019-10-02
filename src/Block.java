@@ -1,10 +1,11 @@
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 
-class Block {
-    static int blockId;
+class Block implements Serializable {
+    int blockId;
     private String hash;
     private String prevHash;
     private ArrayList<Transaction> transactions;
@@ -12,6 +13,7 @@ class Block {
     private int difficulty;
     int nonce;
     Block(String preH, ArrayList<Transaction> tr, String time, int difficulty) throws NoSuchAlgorithmException {
+        this.blockId = 1; //For checking in transfer. Do not set it to 0.
         this.prevHash = preH;
         this.transactions = tr;
         this.time = time;
@@ -23,7 +25,7 @@ class Block {
     // Returns a Hex Hash value
     String calcHash() throws NoSuchAlgorithmException {
 
-        String msg = blockId + String.valueOf(time) + transactions.size();
+        String msg = blockId + String.valueOf(time) + transactions.size() + nonce;
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] bytes = digest.digest(msg.getBytes());
@@ -36,6 +38,15 @@ class Block {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    public void mineBlock(int difficulty) throws NoSuchAlgorithmException {
+        String tar = new String(new char[difficulty]);
+        while(!hash.substring(0,difficulty).equals(tar)){
+            nonce++;
+            hash = calcHash();
+        }
+        System.out.println("Block is Mined!! :" + hash);
     }
 
     String getCurrentHash(){
