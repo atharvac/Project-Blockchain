@@ -33,7 +33,6 @@ class MedicalHistory implements Serializable {
         DISEASES = d;
     }
     void setALLERGIES(ArrayList<String>a){
-  ALLERGIES = a;
+        ALLERGIES = a;
     }
 }
-

@@ -25,7 +25,7 @@ class Block implements Serializable {
     // Returns a Hex Hash value
     String calcHash() throws NoSuchAlgorithmException {
 
-        String msg = blockId + String.valueOf(time) + transactions.size() + nonce;
+        String msg = prevHash + blockId + String.valueOf(time) + transactions.size() + nonce;
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] bytes = digest.digest(msg.getBytes());
