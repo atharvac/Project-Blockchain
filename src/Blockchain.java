@@ -29,12 +29,36 @@ class Blockchain implements Serializable {
         this.difficulty = diff;
     }
 
-    void add(Block bk) throws NoSuchAlgorithmException {
-        // Addition code for a new block
-        // Might need to check if prev hash == bk prev hash
-        bk.setPrevHash(chain.get((int) (chain.size()-1.)).getCurrentHash());//This should be in mining code.
-        bk.calcHash();
-        this.chain.add(bk);
+    void start_mining() throws NoSuchAlgorithmException {
+        return;
+    }
+
+    void add(Block bk){
+        if (!bk.getPrevHash().equals(chain.get(chain.size()-1).getCurrentHash())){// Check if new block slots on the blockchain
+            System.out.println("Block Rejected! : Blockchain hash does not match!");
+            return;
+        }
+        ArrayList<Transaction> pTr = chain.get(chain.size()-1).getTransactions();
+        ArrayList<Transaction> nTr = bk.getTransactions();
+
+        ArrayList<String> prevTr = new ArrayList<>();
+        ArrayList<String> newTr = new ArrayList<>();
+
+        for (Transaction t : pTr) {
+            prevTr.add(t.id);
+        }
+        for (Transaction t : nTr) {
+            newTr.add(t.id);
+        }
+
+        prevTr.retainAll(newTr);
+
+        if (prevTr.size() != 0){// Check if previous block has some of the same transactions.
+            System.out.println("Block Rejected! : Duplicate Transactions!");
+        }
+        else{
+            this.chain.add(bk);
+        }
     }
 
     boolean isValid() throws NoSuchAlgorithmException {

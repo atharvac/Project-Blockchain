@@ -103,6 +103,6 @@ class CreateDB{
 
     public static void main(String[] args) {
         CreateDB db = new CreateDB();
-        db.create_conn_history("Hi.db");
+        db.create_conn_history("History.db");
     }
 }

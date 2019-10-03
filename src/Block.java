@@ -25,7 +25,7 @@ class Block implements Serializable {
     // Returns a Hex Hash value
     String calcHash() throws NoSuchAlgorithmException {
 
-        String msg = prevHash + blockId + String.valueOf(time) + transactions.size() + nonce;
+        String msg = prevHash + blockId + time + transactions.size() + nonce;
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] bytes = digest.digest(msg.getBytes());
@@ -49,8 +49,8 @@ class Block implements Serializable {
             nonce++;
             hash = calcHash();
         }
-        if (hash.substring(0,difficulty).equals(tar.toString())){return true;}
-        else {return false;}
+        Blockchain.mineInterrupt = false; //Once stopped, removes interrupt.
+        return hash.substring(0, difficulty).equals(tar.toString());
 
     }
 
@@ -77,10 +77,16 @@ class Block implements Serializable {
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
         ArrayList<Transaction> a = new ArrayList<>();
-        Block b = new Block("", a, "12-09-19", 5);
+        Block b = new Block("", a, "12-09-19", 6);
         System.out.println(b.mineBlock());
         System.out.println(b.getCurrentHash());
         System.out.println(b.getBlockId());
+        System.out.println("Nonce:"+b.nonce);
+        Block c = new Block(b.getCurrentHash(), a, "12-09-19", 6);
+        System.out.println(c.mineBlock());
+        System.out.println(c.getCurrentHash());
+        System.out.println(c.getBlockId());
+        System.out.println("Nonce:"+c.nonce);
     }
 
 }
