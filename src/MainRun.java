@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainRun {
+    static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
     private int DIFFICULTY = 2;
     public Blockchain b_chain;
     ReceiveData server;
@@ -64,7 +65,7 @@ public class MainRun {
     String makeTransaction() throws IOException {
         Transaction tr = new Transaction();
         TransferData td = new TransferData(b_chain.ID, tr);
-        SendData sd = new SendData("192.168.0.255", 7777);
+        SendData sd = new SendData(MainRun.BROADCAST_ADDRESS, 7777);
         sd.broadcastData(td);
         return b_chain.ID;// Here goes Transaction Information.
     }

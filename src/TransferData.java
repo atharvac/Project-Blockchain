@@ -78,7 +78,7 @@ class SendData {
      void endBroadcast() throws IOException, NoSuchAlgorithmException {
         ArrayList<Transaction> a = new ArrayList<>();
         Block b = new Block("", a, "0-0-0", 0);
-        b.blockId = 0;
+        b.blockId = "0";
         TransferData t = new TransferData("", b);
         broadcastData(t);
     }
@@ -107,7 +107,7 @@ class ReceiveData extends Thread {
     void checkHeaders(TransferData t) {
         switch(t.getHeader()){
             case "Block":
-                if (t.getBlock().blockId != 0){
+                if (!t.getBlock().blockId.equals("0")){
                     b_chain.chain.add(t.getBlock());
                     System.out.println("Block added!");
                 }

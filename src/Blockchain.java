@@ -8,6 +8,7 @@ class Blockchain implements Serializable {
     ArrayList<Transaction> pendingTransactions;
     private int difficulty = 0;
     String ID;
+    static boolean mineInterrupt = false;
 
     public Blockchain(String ID, int diff) throws NoSuchAlgorithmException, SocketException {
         this.ID = ID;

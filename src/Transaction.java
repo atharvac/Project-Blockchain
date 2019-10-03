@@ -8,4 +8,5 @@ class Transaction implements Serializable {
     int id;
     float amount;
     MedicalObject object;
+    MedicalHistory history;
 }
