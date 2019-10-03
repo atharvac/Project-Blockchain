@@ -7,5 +7,5 @@ class Transaction implements Serializable {
     String digital_signature;
     int id;
     float amount;
-    MedicalObject object = new MedicalObject();
+    MedicalObject object;
 }
