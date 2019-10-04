@@ -1,17 +1,19 @@
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 
-class Block {
-    static int blockId;
+class Block implements Serializable {
+    String blockId;
     private String hash;
     private String prevHash;
     private ArrayList<Transaction> transactions;
     private String time;
     private int difficulty;
-    int nonce = 0000;
+    int nonce;
     Block(String preH, ArrayList<Transaction> tr, String time, int difficulty) throws NoSuchAlgorithmException {
+        this.blockId = String.valueOf((int) (Math.random() * 100000));
         this.prevHash = preH;
         this.transactions = tr;
         this.time = time;
@@ -23,7 +25,7 @@ class Block {
     // Returns a Hex Hash value
     String calcHash() throws NoSuchAlgorithmException {
 
-        String msg = blockId + String.valueOf(time) + transactions.size() + nonce;
+        String msg = prevHash + blockId + time + transactions.size() + nonce;
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] bytes = digest.digest(msg.getBytes());
@@ -38,13 +40,18 @@ class Block {
         return hexString.toString();
     }
 
-    public void mineBlock(int difficulty) throws NoSuchAlgorithmException {
-        String tar = new String(new char[difficulty]);
-        while(!hash.substring(0,difficulty).equals(tar)){
+    public boolean mineBlock() throws NoSuchAlgorithmException {
+        StringBuilder tar = new StringBuilder();
+        for (int x=0; x < difficulty; x++){
+            tar.append("0");
+        }
+        while(!hash.substring(0,difficulty).equals(tar.toString()) && !Blockchain.mineInterrupt){
             nonce++;
             hash = calcHash();
         }
-        System.out.println("Block is Mined!! :" + hash);
+        Blockchain.mineInterrupt = false; //Once stopped, removes interrupt.
+        return hash.substring(0, difficulty).equals(tar.toString());
+
     }
 
     String getCurrentHash(){
@@ -60,8 +67,26 @@ class Block {
         return time;
     }
 
+    public String getBlockId(){
+        return blockId;
+    }
+
     public void setPrevHash(String prevHash) {
         this.prevHash = prevHash;
+    }
+
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        ArrayList<Transaction> a = new ArrayList<>();
+        Block b = new Block("", a, "12-09-19", 6);
+        System.out.println(b.mineBlock());
+        System.out.println(b.getCurrentHash());
+        System.out.println(b.getBlockId());
+        System.out.println("Nonce:"+b.nonce);
+        Block c = new Block(b.getCurrentHash(), a, "12-09-19", 6);
+        System.out.println(c.mineBlock());
+        System.out.println(c.getCurrentHash());
+        System.out.println(c.getBlockId());
+        System.out.println("Nonce:"+c.nonce);
     }
 
 }

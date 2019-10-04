@@ -1,17 +1,25 @@
+import java.io.Serializable;
+import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-class Blockchain {
+class Blockchain implements Serializable {
     ArrayList<Block> chain;
     ArrayList<Transaction> pendingTransactions;
     private int difficulty = 0;
+    String ID;
+    static boolean mineInterrupt = false;
 
-    public Blockchain() throws NoSuchAlgorithmException {
+    public Blockchain(String ID, int diff) throws NoSuchAlgorithmException, SocketException {
+        this.ID = ID;
         chain = new ArrayList<>();
-        chain.add(generateFirstBlock());
+        pendingTransactions = new ArrayList<>();
+        setDifficulty(diff);
+        chain.add(generateGenesisBlock());
+
     }
 
-    private Block generateFirstBlock() throws NoSuchAlgorithmException {
+    private Block generateGenesisBlock() throws NoSuchAlgorithmException {
         Block generate = new Block("null",pendingTransactions,"27/05/1999",difficulty);
         generate.setPrevHash(null);
         generate.calcHash();
@@ -21,12 +29,36 @@ class Blockchain {
         this.difficulty = diff;
     }
 
-    void add(Block bk) throws NoSuchAlgorithmException {
-        // Addition code for a new block
+    void start_mining() throws NoSuchAlgorithmException {
+        return;
+    }
 
-        bk.setPrevHash(chain.get((int) (chain.size()-1.)).getCurrentHash());
-        bk.calcHash();
-        this.chain.add(bk);
+    void add(Block bk){
+        if (!bk.getPrevHash().equals(chain.get(chain.size()-1).getCurrentHash())){// Check if new block slots on the blockchain
+            System.out.println("Block Rejected! : Blockchain hash does not match!");
+            return;
+        }
+        ArrayList<Transaction> pTr = chain.get(chain.size()-1).getTransactions();
+        ArrayList<Transaction> nTr = bk.getTransactions();
+
+        ArrayList<String> prevTr = new ArrayList<>();
+        ArrayList<String> newTr = new ArrayList<>();
+
+        for (Transaction t : pTr) {
+            prevTr.add(t.id);
+        }
+        for (Transaction t : nTr) {
+            newTr.add(t.id);
+        }
+
+        prevTr.retainAll(newTr);
+
+        if (prevTr.size() != 0){// Check if previous block has some of the same transactions.
+            System.out.println("Block Rejected! : Duplicate Transactions!");
+        }
+        else{
+            this.chain.add(bk);
+        }
     }
 
     boolean isValid() throws NoSuchAlgorithmException {
@@ -51,10 +83,6 @@ class Blockchain {
             }
         }
         return true;
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Block-chain!");
     }
 }
 
