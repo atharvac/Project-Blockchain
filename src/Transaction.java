@@ -29,6 +29,7 @@ class Transaction implements Serializable {
     }
 
     void setAmount(float amt){
+        Header = "Money";
         this.amount = amt;
     }
 

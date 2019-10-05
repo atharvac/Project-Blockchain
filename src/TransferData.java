@@ -108,13 +108,11 @@ class ReceiveData extends Thread {
         switch(t.getHeader()){
             case "Block":
                 if (!t.getBlock().blockId.equals("0")){
-                    b_chain.chain.add(t.getBlock());
-                    System.out.println("Block added!");
+                    b_chain.validate_add_block(t.getBlock());
                 }
                 break;
             case "Transaction":
-                b_chain.pendingTransactions.add(t.getTransaction());
-                System.out.println("Transaction Added");
+                b_chain.validate_add_transaction(t.getTransaction());
                 break;
             case "ChainLength":
                 if (Integer.parseInt(t.getType()) > b_chain.chain.size()){
@@ -143,8 +141,6 @@ class ReceiveData extends Thread {
                 ObjectInputStream ois = new ObjectInputStream(bis);// Create an object from input-stream.
                 TransferData e1  = (TransferData) ois.readObject();// Create the specific object.
                 checkHeaders(e1);
-                //TEST CODE
-                System.out.println(e1.getHeader() + "  " + e1.getSenderID());
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
                 System.out.println("Exception" + e);

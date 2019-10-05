@@ -33,7 +33,7 @@ class Blockchain implements Serializable {
         return;
     }
 
-    void add(Block bk){
+    void validate_add_block(Block bk){
         if (!bk.getPrevHash().equals(chain.get(chain.size()-1).getCurrentHash())){// Check if new block slots on the blockchain
             System.out.println("Block Rejected! : Blockchain hash does not match!");
             return;
@@ -59,6 +59,17 @@ class Blockchain implements Serializable {
         else{
             this.chain.add(bk);
         }
+    }
+
+    void validate_add_transaction(Transaction tr){
+        for(Transaction t : pendingTransactions){
+            if(t.id.equals(tr.id)){
+                System.out.println("Duplicate transaction found!");
+                return;
+            }
+        }
+        pendingTransactions.add(tr);
+        System.out.println("\nTransaction from: "+ tr.fromAddress+" Validated");
     }
 
     boolean isValid() throws NoSuchAlgorithmException {

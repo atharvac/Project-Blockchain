@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainRun {
-    static String BROADCAST_ADDRESS = "192.168.0.255"; //Set the current broadcast address
+    static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
     private int DIFFICULTY = 6;
     public Blockchain b_chain;
     ReceiveData server;
@@ -63,7 +63,23 @@ public class MainRun {
     }
 
     String makeTransaction() throws IOException {
-        Transaction tr = new Transaction("", "");
+        Scanner sc = new Scanner(System.in);
+        System.out.print("\n1) Medical Object\n2) Medical History\n3) Funds\n->");
+        String switch_str = sc.nextLine();
+        Transaction tr = new Transaction(String.valueOf((float) (Math.random() * 1000000)), b_chain.ID);
+        switch(switch_str){
+            case "1":
+                break;
+            case "2":
+                break;
+            case "3":
+                System.out.print("Enter amount:");
+                tr.setAmount(sc.nextFloat());
+                break;
+            default:
+                return "Cancelled";
+        }
+
         TransferData td = new TransferData(b_chain.ID, tr);
         SendData sd = new SendData(MainRun.BROADCAST_ADDRESS, 7777);
         sd.broadcastData(td);
@@ -76,7 +92,7 @@ public class MainRun {
         MainRun m = new MainRun();
         m.setup();
         while(run){
-            System.out.print("\n1)Create a transaction\n2)Start Mining\n3)Exit\n:");
+            System.out.print("\n1)Create a transaction\n2)Start Mining\n3)Exit\n->");
             switch (sc.nextLine()){
                 case "1":
                     m.makeTransaction();
