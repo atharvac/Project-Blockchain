@@ -7,6 +7,7 @@ import java.util.ArrayList;
 //This will also receive all the Traffic from ReceiveData class.
 class TransferData implements Serializable {
     //Header determines how the broadcast is handled at the receiver's end
+    static final long serialVersionUID = -687991492884005033L;
     private String header;
     private String senderID;
     private String type;

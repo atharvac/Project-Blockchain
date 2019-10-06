@@ -8,10 +8,11 @@ import java.time.LocalDateTime;
 
 class Blockchain extends Thread implements Serializable {
     ArrayList<Block> chain;
-    ArrayList<Transaction> pendingTransactions;
+    private ArrayList<Transaction> pendingTransactions;
+    private ArrayList<Transaction> currently_mining;
     private int difficulty = 0;
     String ID;
-    String b_chain_broadcast;
+    private String b_chain_broadcast;
     static boolean mineInterrupt = false;
 
     public Blockchain(String ID, int diff, String broadcast_addr) throws NoSuchAlgorithmException, SocketException {
@@ -25,7 +26,8 @@ class Blockchain extends Thread implements Serializable {
     }
 
     private Block generateGenesisBlock() throws NoSuchAlgorithmException {
-        Block generate = new Block("null",pendingTransactions,"27/05/1999",difficulty);
+        ArrayList<Transaction> genesis = new ArrayList<>();
+        Block generate = new Block("null", pendingTransactions,"27/05/1999",0);
         generate.setPrevHash(null);
         generate.calcHash();
         return generate;
@@ -34,32 +36,37 @@ class Blockchain extends Thread implements Serializable {
         this.difficulty = diff;
     }
 
-    void start_mining() throws NoSuchAlgorithmException {
+    void start_mining() throws NoSuchAlgorithmException, InterruptedException, IOException {
         Blockchain.mineInterrupt = false;
-
-        while(!Blockchain.mineInterrupt){
-            if (pendingTransactions.size() < 4){
-                System.out.println("Waiting for transactions...");
+        boolean flag = true;
+        int k = 2;
+        currently_mining = new ArrayList<>();
+        while(!MainRun.stopThread_mining){
+            if (pendingTransactions.size() < k){
+                if (flag) {
+                    System.out.println("Waiting for transactions...");
+                    flag = false;
+                }
+                Thread.sleep(5000);
             }
             else {
-                ArrayList<Transaction> _4Trs = new ArrayList<>();
-                for (int i=0;i<4;i++){
-                    _4Trs.add(pendingTransactions.get(i));
+                System.out.println(pendingTransactions.size());
+                for (int i=0;i<k;i++){
+                    currently_mining.add(pendingTransactions.get(i));
                 }
                 //Get current time
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                 LocalDateTime now = LocalDateTime.now();
                 String s = dtf.format(now);
-                Block newBlock = new Block(chain.get(chain.size()-1).getCurrentHash(), _4Trs, s, difficulty);
+                Block newBlock = new Block(chain.get(chain.size()-1).getCurrentHash(), currently_mining, s, difficulty);
 
                 if(newBlock.mineBlock()){
+                    pendingTransactions.removeAll(currently_mining);
                     TransferData sendBlock = new TransferData(ID, newBlock);
                     SendData sd = new SendData(b_chain_broadcast, 7777);
-                    try {
-                        sd.broadcastData(sendBlock);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    sd.broadcastData(sendBlock);
+                    System.out.println("Block sent! ID:"+ newBlock.blockId);
+                    currently_mining.clear();
                 }
                 else{
                     newBlock = null;
@@ -71,7 +78,7 @@ class Blockchain extends Thread implements Serializable {
     public void run(){
         try {
             start_mining();
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -83,7 +90,7 @@ class Blockchain extends Thread implements Serializable {
         }
         ArrayList<Transaction> pTr = chain.get(chain.size()-1).getTransactions();
         ArrayList<Transaction> nTr = bk.getTransactions();
-
+        System.out.println("Blockchain Size:"+ chain.size());
         ArrayList<String> prevTr = new ArrayList<>();
         ArrayList<String> newTr = new ArrayList<>();
 
@@ -97,10 +104,12 @@ class Blockchain extends Thread implements Serializable {
         prevTr.retainAll(newTr);
 
         if (prevTr.size() != 0){// Check if previous block has some of the same transactions.
+            System.out.println(prevTr.size());
             System.out.println("Block Rejected! : Duplicate Transactions!");
         }
         else{
             this.chain.add(bk);
+            System.out.println("New block added to blockchain ID:"+ bk.blockId);
             for(Transaction t : pendingTransactions){
                 for (String s : newTr){
                     if (t.id.equals(s)){
@@ -108,6 +117,8 @@ class Blockchain extends Thread implements Serializable {
                     }
                 }
             }
+            // Interrupt any mining process as new block has been acquired.
+            Blockchain.mineInterrupt = true;
         }
     }
 
