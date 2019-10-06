@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class MainRun {
     private static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
     public static boolean stopThread_mining = false;
-    private int DIFFICULTY = 2;
+    private int DIFFICULTY = 5;
     private Blockchain b_chain;
     private ReceiveData server;
     private SendData sd;
@@ -31,9 +31,13 @@ public class MainRun {
                 ObjectInputStream oi = new ObjectInputStream(fi);
 
                 b_chain = (Blockchain) oi.readObject();
+                System.out.println("Chain size:" + b_chain.chain.size());
                 oi.close();
                 fi.close();
                 if(!b_chain.isValid()){
+                    for (Block b : b_chain.chain){
+                        System.out.println(b.getPrevHash() + "->" + b.getCurrentHash());
+                    }
                     System.out.println("Invalid Blockchain!, creating a new one.");
                     b_chain = null;
                     createNewBChain();
@@ -66,7 +70,7 @@ public class MainRun {
             o.writeObject(b_chain);
             o.close();
             f.close();
-            System.out.println("Good-Bye!");
+            System.out.println("Good-Bye!"+ "Chain size = " + b_chain.chain.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,7 +96,7 @@ public class MainRun {
             default:
                 return "Cancelled";
         }
-
+        b_chain.validate_add_transaction(tr);
         TransferData td = new TransferData(b_chain.ID, tr);
         SendData sd = new SendData(MainRun.BROADCAST_ADDRESS, 7777);
         sd.broadcastData(td);

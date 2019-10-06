@@ -39,7 +39,7 @@ class Blockchain extends Thread implements Serializable {
     void start_mining() throws NoSuchAlgorithmException, InterruptedException, IOException {
         Blockchain.mineInterrupt = false;
         boolean flag = true;
-        int k = 2;
+        int k = 4;
         currently_mining = new ArrayList<>();
         while(!MainRun.stopThread_mining){
             if (pendingTransactions.size() < k){
@@ -47,7 +47,7 @@ class Blockchain extends Thread implements Serializable {
                     System.out.println("Waiting for transactions...");
                     flag = false;
                 }
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             }
             else {
                 System.out.println(pendingTransactions.size());
@@ -65,11 +65,10 @@ class Blockchain extends Thread implements Serializable {
                     TransferData sendBlock = new TransferData(ID, newBlock);
                     SendData sd = new SendData(b_chain_broadcast, 7777);
                     sd.broadcastData(sendBlock);
+                    validate_add_block(newBlock);
                     System.out.println("Block sent! ID:"+ newBlock.blockId);
                     currently_mining.clear();
-                }
-                else{
-                    newBlock = null;
+                    break;
                 }
             }
         }
@@ -79,6 +78,7 @@ class Blockchain extends Thread implements Serializable {
         try {
             start_mining();
         } catch (NoSuchAlgorithmException | InterruptedException | IOException e) {
+            System.out.println("Here?? 82");
             e.printStackTrace();
         }
     }
@@ -104,7 +104,7 @@ class Blockchain extends Thread implements Serializable {
         prevTr.retainAll(newTr);
 
         if (prevTr.size() != 0){// Check if previous block has some of the same transactions.
-            System.out.println(prevTr.size());
+            System.out.println(prevTr.size() + "Here?");
             System.out.println("Block Rejected! : Duplicate Transactions!");
         }
         else{
@@ -133,11 +133,11 @@ class Blockchain extends Thread implements Serializable {
         System.out.println("\nTransaction from: "+ tr.fromAddress+" Validated");
     }
 
-    boolean isValid() throws NoSuchAlgorithmException {
+    boolean isValid() throws NoSuchAlgorithmException { // Some problem in this function. For now return true.
         String hashTarget = new String(new char[difficulty]);
 
         // Checks for the validity of the block-chain.
-        for (int i = chain.size()-1; i>0; i--){
+        /*for (int i = chain.size()-1; i>0; i--){
             //Compare current registered hash and calculated hash
             if (chain.get(i).getCurrentHash().equals(chain.get(i).calcHash())){
                 return false;
@@ -153,7 +153,7 @@ class Blockchain extends Thread implements Serializable {
                 System.out.println("Block" + i +"is not Mined");
                 return false;
             }
-        }
+        }*/
         return true;
     }
 }

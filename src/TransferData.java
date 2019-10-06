@@ -93,7 +93,7 @@ class ReceiveData extends Thread {
     private boolean running;
     DatagramSocket socket;
     Blockchain b_chain;
-    byte[] buf = new byte[1024];
+    byte[] buf = new byte[64000];
 
     ReceiveData(int port, Blockchain chain) throws SocketException {
         this.port = port;
@@ -106,6 +106,8 @@ class ReceiveData extends Thread {
 
     // Check headers from transmissions and perform certain actions.
     void checkHeaders(TransferData t) {
+        if(t.getSenderID().equals(b_chain.ID))
+            return;
         switch(t.getHeader()){
             case "Block":
                 if (!t.getBlock().blockId.equals("0")){
@@ -132,6 +134,7 @@ class ReceiveData extends Thread {
             try {
                 socket.receive(packet);// Receive the packet.
             } catch (IOException e) {
+                System.out.println("This exception:");
                 e.printStackTrace();
             }
 
