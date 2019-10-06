@@ -3,16 +3,17 @@ import java.io.Serializable;
 class Transaction implements Serializable {
     String Header;
     String fromAddress; // Both of these addresses will be blockchain ID's.
-    String toAddress;
-    String digital_signature;
+    private String toAddress;
+    private String digital_signature;
     String id;
-    float amount;
-    MedicalObject object;
-    MedicalHistory history;
+    private float amount;
+    private MedicalObject object;
+    private MedicalHistory history;
 
-    Transaction(String id, String myAddr){
+    Transaction(String id, String myAddr, String toAddr){
         this.id = id;
         this.fromAddress = myAddr;
+        this.toAddress = toAddr;
     }
 
     Transaction(Transaction t){

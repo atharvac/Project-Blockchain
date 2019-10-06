@@ -3,7 +3,7 @@ import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-class Blockchain implements Serializable {
+class Blockchain extends Thread implements Serializable {
     ArrayList<Block> chain;
     ArrayList<Transaction> pendingTransactions;
     private int difficulty = 0;
@@ -33,6 +33,14 @@ class Blockchain implements Serializable {
         return;
     }
 
+    public void run(){
+        try {
+            start_mining();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
     void validate_add_block(Block bk){
         if (!bk.getPrevHash().equals(chain.get(chain.size()-1).getCurrentHash())){// Check if new block slots on the blockchain
             System.out.println("Block Rejected! : Blockchain hash does not match!");
@@ -58,6 +66,13 @@ class Blockchain implements Serializable {
         }
         else{
             this.chain.add(bk);
+            for(Transaction t : pendingTransactions){
+                for (String s : newTr){
+                    if (t.id.equals(s)){
+                        pendingTransactions.remove(t);
+                    }
+                }
+            }
         }
     }
 

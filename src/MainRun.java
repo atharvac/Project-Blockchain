@@ -1,17 +1,14 @@
-import com.sun.tools.javac.Main;
-
 import java.io.*;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainRun {
-    static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
+    private static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
     private int DIFFICULTY = 6;
-    public Blockchain b_chain;
-    ReceiveData server;
-    SendData sd;
+    private Blockchain b_chain;
+    private ReceiveData server;
+    private SendData sd;
     void setup() throws SocketException {
         File file = new File("Ledger.txt");
         if (file.exists()){
@@ -41,7 +38,7 @@ public class MainRun {
 
     }
 
-    void exit() throws IOException {
+    private void exit() throws IOException {
         sd = new SendData("localhost", 7777);
         try {
             sd.endBroadcast();
@@ -62,11 +59,14 @@ public class MainRun {
         }
     }
 
-    String makeTransaction() throws IOException {
+    String makeTransaction() throws IOException { // Only for console TAG{CONSOLE}
         Scanner sc = new Scanner(System.in);
+        System.out.print("Enter the Blockchain ID of recipient:");
+        String SendTO = sc.nextLine();
         System.out.print("\n1) Medical Object\n2) Medical History\n3) Funds\n->");
         String switch_str = sc.nextLine();
-        Transaction tr = new Transaction(String.valueOf((float) (Math.random() * 1000000)), b_chain.ID);
+        Transaction tr = new Transaction(String.valueOf((float) (Math.random() * 1000000)), b_chain.ID, SendTO);
+        // Transaction tr = new Transaction("1", b_chain.ID);
         switch(switch_str){
             case "1":
                 break;
@@ -83,10 +83,10 @@ public class MainRun {
         TransferData td = new TransferData(b_chain.ID, tr);
         SendData sd = new SendData(MainRun.BROADCAST_ADDRESS, 7777);
         sd.broadcastData(td);
-        return b_chain.ID;// Here goes Transaction Information.
+        return "Transaction from "+b_chain.ID + " to "+ SendTO + "Type -" + tr.Header;// Here goes Transaction Information.
     }
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws IOException { //{CONSOLE}
         boolean run = true;
         Scanner sc = new Scanner(System.in);
         MainRun m = new MainRun();

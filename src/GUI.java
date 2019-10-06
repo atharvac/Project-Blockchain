@@ -27,10 +27,19 @@ public class GUI {
     }
 
     public static void main(String[] args) throws SocketException {
-        JFrame frame = new JFrame("Blockchain");
-        frame.setSize(800,600);
-        frame.setContentPane(new GUI().Panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JFrame frame = new JFrame("Blockchain");
+                frame.setSize(800,600);
+                try {
+                    frame.setContentPane(new GUI().Panel);
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                }
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setVisible(true);
+            }
+        });
     }
 }
