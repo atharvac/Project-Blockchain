@@ -27,7 +27,7 @@ public class MainRun {
         else {
             String ID = String.valueOf((int) (Math.random() * 100000));
             try {
-                b_chain = new Blockchain(ID, DIFFICULTY);
+                b_chain = new Blockchain(ID, DIFFICULTY, BROADCAST_ADDRESS);
             } catch (NoSuchAlgorithmException | SocketException e) {
                 e.printStackTrace();
             }

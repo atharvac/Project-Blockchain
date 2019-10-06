@@ -1,17 +1,22 @@
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 class Blockchain extends Thread implements Serializable {
     ArrayList<Block> chain;
     ArrayList<Transaction> pendingTransactions;
     private int difficulty = 0;
     String ID;
+    String b_chain_broadcast;
     static boolean mineInterrupt = false;
 
-    public Blockchain(String ID, int diff) throws NoSuchAlgorithmException, SocketException {
+    public Blockchain(String ID, int diff, String broadcast_addr) throws NoSuchAlgorithmException, SocketException {
         this.ID = ID;
+        this.b_chain_broadcast = broadcast_addr;
         chain = new ArrayList<>();
         pendingTransactions = new ArrayList<>();
         setDifficulty(diff);
@@ -30,7 +35,37 @@ class Blockchain extends Thread implements Serializable {
     }
 
     void start_mining() throws NoSuchAlgorithmException {
-        return;
+        Blockchain.mineInterrupt = false;
+
+        while(!Blockchain.mineInterrupt){
+            if (pendingTransactions.size() < 4){
+                System.out.println("Waiting for transactions...");
+            }
+            else {
+                ArrayList<Transaction> _4Trs = new ArrayList<>();
+                for (int i=0;i<4;i++){
+                    _4Trs.add(pendingTransactions.get(i));
+                }
+                //Get current time
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                String s = dtf.format(now);
+                Block newBlock = new Block(chain.get(chain.size()-1).getCurrentHash(), _4Trs, s, difficulty);
+
+                if(newBlock.mineBlock()){
+                    TransferData sendBlock = new TransferData(ID, newBlock);
+                    SendData sd = new SendData(b_chain_broadcast, 7777);
+                    try {
+                        sd.broadcastData(sendBlock);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    newBlock = null;
+                }
+            }
+        }
     }
 
     public void run(){

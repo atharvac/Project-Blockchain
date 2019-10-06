@@ -49,7 +49,7 @@ class Block implements Serializable {
             nonce++;
             hash = calcHash();
         }
-        Blockchain.mineInterrupt = false; //Once stopped, removes interrupt.
+        //Blockchain.mineInterrupt = false; //Once stopped, removes interrupt.
         return hash.substring(0, difficulty).equals(tar.toString());
 
     }
