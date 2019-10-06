@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainRun {
-    static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
+    static String BROADCAST_ADDRESS = "192.168.0.255"; //Set the current broadcast address
     private int DIFFICULTY = 6;
     public Blockchain b_chain;
     ReceiveData server;

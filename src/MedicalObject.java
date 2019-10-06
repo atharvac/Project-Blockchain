@@ -1,8 +1,5 @@
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 class MedicalObject implements Serializable {
@@ -24,8 +21,21 @@ class MedicalObject implements Serializable {
         return;
     }
 
-    void getFromDB(){
-        return;
+    void getFromDB(String obj,String bg){
+
+        String url = "jdbc:sqlite:Object.db";
+        Connection conn = null;
+        try {
+            String SQL;
+            SQL="select QUANTITY from NAME where ";
+            conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }
 class MedicalHistory implements Serializable {
@@ -59,14 +69,15 @@ class MedicalHistory implements Serializable {
 }
 
 class CreateDB{
-    String url;
+    String url1,url2;
     Connection conn;
-    void create_conn_history(String name){
-        url = "jdbc:sqlite:" + name;
+    void create_conn_history(String name1,String name2){
+        url1 = "jdbc:sqlite:" + name1;
+        url2 = "jdbc:sqlite:" + name2;
         try {
 
             // Creating a structure for history database
-            conn = DriverManager.getConnection(url);
+            conn = DriverManager.getConnection(url1);
             Statement stmt = conn.createStatement();
             stmt.execute("create table Blood(ID INTEGER PRIMARY KEY AUTOINCREMENT, type varchar(3));");
             stmt.execute("create table history(ID integer primary key autoincrement, name varchar(25), address varchar(50), bg_id int, foreign key(bg_id) references Blood(ID));");
@@ -82,6 +93,14 @@ class CreateDB{
             stmt.execute("insert into Blood values(NULL,'AB+');");
             stmt.execute("insert into Blood values(NULL,'AB-');");
 
+            // Creating a structure for object database
+            conn = DriverManager.getConnection(url2);
+            stmt = conn.createStatement();
+            stmt.execute("create table TYPE(ID INTEGER PRIMARY KEY AUTOINCREMENT, type varchar(10));");
+            stmt.execute("create table  (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME varchar(20),QUANTITY integer,BLOOD_TYPE varchar(3));");
+
+
+
 
         } catch (SQLException e) {
             System.out.println("Database creation failed!");
@@ -90,19 +109,10 @@ class CreateDB{
         }
     }
 
-    void create_conn_hospital(String name){
-        url = "jdbc:sqlite:" + name;
-        try {
-            conn = DriverManager.getConnection(url);
-            Statement stmt = conn.createStatement();
-            //
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     public static void main(String[] args) {
         CreateDB db = new CreateDB();
-        db.create_conn_history("History.db");
+        db.create_conn_history("History.db", "Object.db");
     }
 }
