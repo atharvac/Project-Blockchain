@@ -7,6 +7,7 @@ import java.util.ArrayList;
 //This will also receive all the Traffic from ReceiveData class.
 class TransferData implements Serializable {
     //Header determines how the broadcast is handled at the receiver's end
+    static final long serialVersionUID = -687991492884005033L;
     private String header;
     private String senderID;
     private String type;
@@ -92,7 +93,7 @@ class ReceiveData extends Thread {
     private boolean running;
     DatagramSocket socket;
     Blockchain b_chain;
-    byte[] buf = new byte[1024];
+    byte[] buf = new byte[64000];
 
     ReceiveData(int port, Blockchain chain) throws SocketException {
         this.port = port;
@@ -105,16 +106,16 @@ class ReceiveData extends Thread {
 
     // Check headers from transmissions and perform certain actions.
     void checkHeaders(TransferData t) {
+        if(t.getSenderID().equals(b_chain.ID))
+            return;
         switch(t.getHeader()){
             case "Block":
                 if (!t.getBlock().blockId.equals("0")){
-                    b_chain.chain.add(t.getBlock());
-                    System.out.println("Block added!");
+                    b_chain.validate_add_block(t.getBlock());
                 }
                 break;
             case "Transaction":
-                b_chain.pendingTransactions.add(t.getTransaction());
-                System.out.println("Transaction Added");
+                b_chain.validate_add_transaction(t.getTransaction());
                 break;
             case "ChainLength":
                 if (Integer.parseInt(t.getType()) > b_chain.chain.size()){
@@ -133,6 +134,7 @@ class ReceiveData extends Thread {
             try {
                 socket.receive(packet);// Receive the packet.
             } catch (IOException e) {
+                System.out.println("This exception:");
                 e.printStackTrace();
             }
 
@@ -143,8 +145,6 @@ class ReceiveData extends Thread {
                 ObjectInputStream ois = new ObjectInputStream(bis);// Create an object from input-stream.
                 TransferData e1  = (TransferData) ois.readObject();// Create the specific object.
                 checkHeaders(e1);
-                //TEST CODE
-                System.out.println(e1.getHeader() + "  " + e1.getSenderID());
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
                 System.out.println("Exception" + e);

@@ -11,11 +11,11 @@ class Block implements Serializable {
     private ArrayList<Transaction> transactions;
     private String time;
     private int difficulty;
-    int nonce;
+    private int nonce;
     Block(String preH, ArrayList<Transaction> tr, String time, int difficulty) throws NoSuchAlgorithmException {
         this.blockId = String.valueOf((int) (Math.random() * 100000));
         this.prevHash = preH;
-        this.transactions = tr;
+        this.transactions = new ArrayList<>(tr);
         this.time = time;
         this.difficulty = difficulty;
         this.hash = calcHash();
@@ -40,16 +40,14 @@ class Block implements Serializable {
         return hexString.toString();
     }
 
-    public boolean mineBlock() throws NoSuchAlgorithmException {
+    boolean mineBlock() throws NoSuchAlgorithmException {
         StringBuilder tar = new StringBuilder();
-        for (int x=0; x < difficulty; x++){
-            tar.append("0");
-        }
+        tar.append("0".repeat(Math.max(0, difficulty)));
         while(!hash.substring(0,difficulty).equals(tar.toString()) && !Blockchain.mineInterrupt){
             nonce++;
             hash = calcHash();
         }
-        Blockchain.mineInterrupt = false; //Once stopped, removes interrupt.
+        //Blockchain.mineInterrupt = false; //Once stopped, removes interrupt.
         return hash.substring(0, difficulty).equals(tar.toString());
 
     }
@@ -77,12 +75,12 @@ class Block implements Serializable {
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
         ArrayList<Transaction> a = new ArrayList<>();
-        Block b = new Block("", a, "12-09-19", 6);
+        Block b = new Block("", a, "12-09-19", 2);
         System.out.println(b.mineBlock());
         System.out.println(b.getCurrentHash());
         System.out.println(b.getBlockId());
         System.out.println("Nonce:"+b.nonce);
-        Block c = new Block(b.getCurrentHash(), a, "12-09-19", 6);
+        Block c = new Block(b.getCurrentHash(), a, "12-09-19", 2);
         System.out.println(c.mineBlock());
         System.out.println(c.getCurrentHash());
         System.out.println(c.getBlockId());

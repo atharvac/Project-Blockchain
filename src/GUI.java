@@ -3,13 +3,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.SocketException;
+import java.security.NoSuchAlgorithmException;
 
 public class GUI {
     private JPanel Panel;
     private JButton button1;
     private JTextArea textArea1;
 
-    public GUI() throws SocketException {
+    public GUI() throws SocketException, NoSuchAlgorithmException {
         MainRun m = new MainRun();
         m.setup();
         button1.addActionListener(new ActionListener() {
@@ -27,10 +28,19 @@ public class GUI {
     }
 
     public static void main(String[] args) throws SocketException {
-        JFrame frame = new JFrame("Blockchain");
-        frame.setSize(800,600);
-        frame.setContentPane(new GUI().Panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JFrame frame = new JFrame("Blockchain");
+                frame.setSize(800,600);
+                try {
+                    frame.setContentPane(new GUI().Panel);
+                } catch (SocketException | NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setVisible(true);
+            }
+        });
     }
 }

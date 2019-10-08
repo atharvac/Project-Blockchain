@@ -3,16 +3,27 @@ import com.sun.tools.javac.Main;
 import java.io.*;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainRun {
-    static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
-    private int DIFFICULTY = 6;
-    public Blockchain b_chain;
-    ReceiveData server;
-    SendData sd;
-    void setup() throws SocketException {
+    private static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
+    public static boolean stopThread_mining = false;
+    public static boolean mining_flag = false;
+    private int DIFFICULTY = 5;
+    private Blockchain b_chain;
+    private ReceiveData server;
+    private SendData sd;
+
+    private void createNewBChain(){
+        String ID = String.valueOf((int) (Math.random() * 100000));
+        try {
+            b_chain = new Blockchain(ID, DIFFICULTY, BROADCAST_ADDRESS);
+        } catch (NoSuchAlgorithmException | SocketException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void setup() throws SocketException, NoSuchAlgorithmException {
         File file = new File("Ledger.txt");
         if (file.exists()){
             System.out.println("Ledger Found, Using That.\n");
@@ -21,19 +32,23 @@ public class MainRun {
                 ObjectInputStream oi = new ObjectInputStream(fi);
 
                 b_chain = (Blockchain) oi.readObject();
+                System.out.println("Chain size:" + b_chain.chain.size());
                 oi.close();
                 fi.close();
+                if(!b_chain.isValid()){
+                    for (Block b : b_chain.chain){
+                        System.out.println(b.getPrevHash() + "->" + b.getCurrentHash());
+                    }
+                    System.out.println("Invalid Blockchain!, creating a new one.");
+                    b_chain = null;
+                    createNewBChain();
+                }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
         else {
-            String ID = String.valueOf((int) (Math.random() * 100000));
-            try {
-                b_chain = new Blockchain(ID, DIFFICULTY);
-            } catch (NoSuchAlgorithmException | SocketException e) {
-                e.printStackTrace();
-            }
+            createNewBChain();
         }
         server = new ReceiveData(7777, b_chain);
         Thread t1 = new Thread(server);
@@ -41,7 +56,7 @@ public class MainRun {
 
     }
 
-    void exit() throws IOException {
+    private void exit() throws IOException {
         sd = new SendData("localhost", 7777);
         try {
             sd.endBroadcast();
@@ -56,33 +71,64 @@ public class MainRun {
             o.writeObject(b_chain);
             o.close();
             f.close();
-            System.out.println("Good-Bye!");
+            System.out.println("Good-Bye!"+ "Chain size = " + b_chain.chain.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    String makeTransaction() throws IOException {
-        Transaction tr = new Transaction("");
+    String makeTransaction() throws IOException { // Only for console TAG{CONSOLE}
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter the Blockchain ID of recipient:");
+        String SendTO = sc.nextLine();
+        System.out.print("\n1) Medical Object\n2) Medical History\n3) Funds\n->");
+        String switch_str = sc.nextLine();
+        Transaction tr = new Transaction(String.valueOf((float) (Math.random() * 1000000)), b_chain.ID, SendTO);
+        // Transaction tr = new Transaction("1", b_chain.ID);
+        switch(switch_str){
+            case "1":
+                break;
+            case "2":
+                break;
+            case "3":
+                System.out.print("Enter amount:");
+                tr.setAmount(sc.nextFloat());
+                break;
+            default:
+                return "Cancelled";
+        }
+        b_chain.validate_add_transaction(tr);
         TransferData td = new TransferData(b_chain.ID, tr);
         SendData sd = new SendData(MainRun.BROADCAST_ADDRESS, 7777);
         sd.broadcastData(td);
-        return b_chain.ID;// Here goes Transaction Information.
+        return "Transaction from "+b_chain.ID + " to "+ SendTO + "Type -" + tr.Header;// Here goes Transaction Information.
     }
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException { //{CONSOLE}
         boolean run = true;
         Scanner sc = new Scanner(System.in);
         MainRun m = new MainRun();
         m.setup();
+
         while(run){
-            System.out.print("\n1)Create a transaction\n2)Start Mining\n3)Exit\n:");
+            if(MainRun.mining_flag){
+                Thread miningThread = new Thread(m.b_chain);
+                MainRun.mining_flag = false;
+                miningThread.start();
+
+            }
+            System.out.print("\n1)Create a transaction\n2)Start Mining\n3)Stop Mining\n4)Exit\n->");
             switch (sc.nextLine()){
                 case "1":
                     m.makeTransaction();
                     break;
                 case "2":
-
+                    Thread miningThread = new Thread(m.b_chain);
+                    MainRun.stopThread_mining = false;
+                    miningThread.start();
+                    break;
+                case "3":
+                    MainRun.stopThread_mining = true;
                     break;
                 default:
                     m.exit();
