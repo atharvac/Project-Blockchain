@@ -117,6 +117,9 @@ class Blockchain extends Thread implements Serializable {
                     }
                 }
             }
+            if (!MainRun.stopThread_mining){
+                MainRun.mining_flag = true;
+            }
             // Interrupt any mining process as new block has been acquired.
             Blockchain.mineInterrupt = true;
         }

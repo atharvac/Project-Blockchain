@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class MainRun {
     private static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
     public static boolean stopThread_mining = false;
+    public static boolean mining_flag = false;
     private int DIFFICULTY = 5;
     private Blockchain b_chain;
     private ReceiveData server;
@@ -108,7 +109,14 @@ public class MainRun {
         Scanner sc = new Scanner(System.in);
         MainRun m = new MainRun();
         m.setup();
+
         while(run){
+            if(MainRun.mining_flag){
+                Thread miningThread = new Thread(m.b_chain);
+                MainRun.mining_flag = false;
+                miningThread.start();
+
+            }
             System.out.print("\n1)Create a transaction\n2)Start Mining\n3)Stop Mining\n4)Exit\n->");
             switch (sc.nextLine()){
                 case "1":
