@@ -7,6 +7,10 @@ class MedicalObject implements Serializable {
     String NAME;
     int QUANTITY;
     float AMOUNT;
+    String Blood_type;
+    private Connection conn;
+    String url;
+
     // Basic Attributes of a medical object
     // Maybe this will be a base class for other specific classes, like Drugs, syringes etc.
     // This may be populated by a database.
@@ -15,16 +19,44 @@ class MedicalObject implements Serializable {
         this.NAME = name;
         this.QUANTITY = quant;
         this.AMOUNT = amt;
+
+        url = "jdbc:sqlite:Object.db";
+    }
+    void setBloodType(String bg){
+        Blood_type = bg;
     }
 
-    void store(){
-        return;
+    void store() throws SQLException {
+        conn = DriverManager.getConnection(url);
+        Statement stmt = conn.createStatement();
+        String SQL;
+        if(TYPE.equals("Organ")){
+            SQL = "select * from Organs where NAME="+"'"+NAME+"';";
+            ResultSet rs = stmt.executeQuery(SQL);
+            if(rs.next()){
+                SQL = "update Organs set QUANTITY=QUANTITY+1 where NAME="+"'"+NAME+"'";
+                stmt.execute(SQL);
+            }
+            else{
+                SQL = "insert into Organs values(null," +"'"+NAME+"'"+1+"'"+Blood_type+"');";
+                stmt.execute(SQL);
+            }
+        }
+        else{
+            SQL = "select * from Drugs where NAME="+"'"+NAME+"';";
+            ResultSet rs = stmt.executeQuery(SQL);
+            if(rs.next()){
+                SQL = "update Drugs set QUANTITY=QUANTITY+1 where NAME="+"'"+NAME+"';";
+                stmt.execute(SQL);
+            }
+            else{
+                SQL = "insert into Drugs values(null," +"'"+NAME+"'"+1+";";
+                stmt.execute(SQL);
+            }
+        }
     }
 
     void getFromDB(String obj,String bg){
-
-        String url = "jdbc:sqlite:Object.db";
-        Connection conn = null;
         try {
             String SQL;
             SQL="select QUANTITY from Organs where NAME='obj' and BLOOD_TYPE='bg'";
@@ -55,9 +87,10 @@ class MedicalHistory implements Serializable {
     void setDISEASES(ArrayList<String> d){
         DISEASES = d;
     }
-    void setALLERGIES(ArrayList<String>a){
+    void setALLERGIES(ArrayList<String> a){
         ALLERGIES = a;
     }
+    void setBG(String bg){ this.BLOODGROUP = bg; }
 
     void store(){
         return;
@@ -71,9 +104,14 @@ class MedicalHistory implements Serializable {
 class CreateDB{
     String url1,url2;
     Connection conn;
-    void create_conn_history(String name1,String name2){
-        url1 = "jdbc:sqlite:" + name1;
-        url2 = "jdbc:sqlite:" + name2;
+
+    CreateDB(){
+        url1 = "jdbc:sqlite:" + "History.db";
+        url2 = "jdbc:sqlite:" + "Object.db";
+    }
+
+    void create_conn_history(){
+
         try {
 
             // Creating a structure for history database
@@ -96,9 +134,8 @@ class CreateDB{
             // Creating a structure for object database
             conn = DriverManager.getConnection(url2);
             stmt = conn.createStatement();
-            stmt.execute("create table TYPE(ID INTEGER PRIMARY KEY AUTOINCREMENT, type varchar(10));");
             stmt.execute("create table Organs(ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME varchar(20),QUANTITY integer,BLOOD_TYPE varchar(3));");
-
+            stmt.execute("create table Drugs(ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME varchar(20),QUANTITY integer);");
 
 
 
@@ -113,6 +150,6 @@ class CreateDB{
 
     public static void main(String[] args) {
         CreateDB db = new CreateDB();
-        db.create_conn_history("History.db", "Object.db");
+        db.create_conn_history();
     }
 }

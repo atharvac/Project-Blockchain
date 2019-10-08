@@ -77,6 +77,43 @@ public class MainRun {
         }
     }
 
+    MedicalHistory create_medical_history(){
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter the name:");
+        String _name = sc.nextLine();
+        System.out.print("Enter Address:");
+        String _addr = sc.nextLine();
+        System.out.print("Enter Blood Group:");
+        String _bg = sc.nextLine();
+        System.out.print("Enter Age:");
+        int _age = sc.nextInt();
+        MedicalHistory mh = new MedicalHistory(_name, _addr, _bg, _age);
+
+        // Extract data from string and put into array-list.
+        System.out.println("Enter diseases (Separated by ','):");
+        String _diseases = sc.nextLine();
+        System.out.println("Enter allergies (Separated by ',')");
+        String _allergies = sc.nextLine();
+        return mh;
+    }
+
+    private MedicalObject create_medical_object(){
+        Scanner sc = new Scanner(System.in);
+        String _type, _name;
+        int _quantity;
+        float _amount;
+        System.out.print("Enter type of object (Organ/Drug):");
+        _type = sc.nextLine();
+        System.out.print("Enter name of the object:");
+        _name = sc.nextLine();
+        System.out.print("Enter the quantity:");
+        _quantity = sc.nextInt();
+        System.out.print("Enter the funds to be transferred:");
+        _amount = sc.nextFloat();
+        MedicalObject mobj = new MedicalObject(_type, _name, _quantity, _amount);
+        return mobj;
+    }
+
     String makeTransaction() throws IOException { // Only for console TAG{CONSOLE}
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter the Blockchain ID of recipient:");
@@ -87,8 +124,10 @@ public class MainRun {
         // Transaction tr = new Transaction("1", b_chain.ID);
         switch(switch_str){
             case "1":
+                tr.setObject(create_medical_object());
                 break;
             case "2":
+                tr.setHistory(create_medical_history());
                 break;
             case "3":
                 System.out.print("Enter amount:");
