@@ -24,8 +24,20 @@ class Block implements Serializable {
     // Import or implement hash function SHA256 or any other.
     // Returns a Hex Hash value
     String calcHash() throws NoSuchAlgorithmException {
+        String transaction_string = "";
+        for(Transaction t: transactions){
+            if(t.Header.equals("Money")){
+                transaction_string = transaction_string + t.getAmount() + t.getToAddress();
+            }
+            else if(t.Header.equals("Object")){
+                transaction_string = transaction_string + t.getAmount() + t.Header + t.getToAddress();
+            }
+            else if(t.Header.equals("History")){
+                transaction_string = transaction_string + t.getAmount() + t.Header + t.getToAddress();
+            }
+        }
 
-        String msg = prevHash + blockId + time + transactions.size() + nonce;
+        String msg = prevHash + blockId + time + transaction_string + nonce;
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] bytes = digest.digest(msg.getBytes());
@@ -85,6 +97,7 @@ class Block implements Serializable {
         System.out.println(c.getCurrentHash());
         System.out.println(c.getBlockId());
         System.out.println("Nonce:"+c.nonce);
+        System.out.println("Prev hash = "+ c.getPrevHash());
     }
 
 }

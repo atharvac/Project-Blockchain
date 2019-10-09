@@ -43,4 +43,12 @@ class Transaction implements Serializable {
         Header = "History";
         this.history = his;
     }
+
+    float getAmount(){
+        return amount;
+    }
+
+    String getToAddress(){
+        return toAddress;
+    }
 }
