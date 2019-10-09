@@ -3,6 +3,7 @@ import com.sun.tools.javac.Main;
 import java.io.*;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MainRun {
@@ -110,7 +111,15 @@ public class MainRun {
         _quantity = sc.nextInt();
         System.out.print("Enter the funds to be transferred:");
         _amount = sc.nextFloat();
+        System.out.println("Enter blood type:");
+        String _bg = sc.nextLine();
         MedicalObject mobj = new MedicalObject(_type, _name, _quantity, _amount);
+        try {
+            mobj.setBloodType(_bg);
+            mobj.store();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return mobj;
     }
 

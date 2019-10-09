@@ -8,7 +8,6 @@ class MedicalObject implements Serializable {
     int QUANTITY;
     float AMOUNT;
     String Blood_type;
-    private Connection conn;
     String url;
 
     // Basic Attributes of a medical object
@@ -27,6 +26,7 @@ class MedicalObject implements Serializable {
     }
 
     void store() throws SQLException {
+        Connection conn;
         conn = DriverManager.getConnection(url);
         Statement stmt = conn.createStatement();
         String SQL;
@@ -34,11 +34,12 @@ class MedicalObject implements Serializable {
             SQL = "select * from Organs where NAME="+"'"+NAME+"';";
             ResultSet rs = stmt.executeQuery(SQL);
             if(rs.next()){
-                SQL = "update Organs set QUANTITY=QUANTITY+1 where NAME="+"'"+NAME+"'";
+                SQL = "update Organs set QUANTITY=QUANTITY+"+QUANTITY+" where NAME="+"'"+NAME+"'";
                 stmt.execute(SQL);
             }
             else{
-                SQL = "insert into Organs values(null," +"'"+NAME+"'"+1+"'"+Blood_type+"');";
+                SQL = "insert into Organs values(null," +"'"+NAME+"',"+QUANTITY+",'"+Blood_type+"');";
+                System.out.println(SQL);
                 stmt.execute(SQL);
             }
         }
@@ -46,11 +47,12 @@ class MedicalObject implements Serializable {
             SQL = "select * from Drugs where NAME="+"'"+NAME+"';";
             ResultSet rs = stmt.executeQuery(SQL);
             if(rs.next()){
-                SQL = "update Drugs set QUANTITY=QUANTITY+1 where NAME="+"'"+NAME+"';";
+                SQL = "update Drugs set QUANTITY=QUANTITY+"+QUANTITY+" where NAME="+"'"+NAME+"';";
                 stmt.execute(SQL);
             }
             else{
-                SQL = "insert into Drugs values(null," +"'"+NAME+"'"+1+";";
+                SQL = "insert into Drugs values(null," +"'"+NAME+"',"+QUANTITY+");";
+                System.out.println(SQL);
                 stmt.execute(SQL);
             }
         }
@@ -58,6 +60,7 @@ class MedicalObject implements Serializable {
 
     void getFromDB(String obj,String bg){
         try {
+            Connection conn;
             String SQL;
             SQL="select QUANTITY from Organs where NAME='obj' and BLOOD_TYPE='bg'";
             conn = DriverManager.getConnection(url);
