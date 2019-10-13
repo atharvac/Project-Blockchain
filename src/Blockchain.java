@@ -8,14 +8,16 @@ import java.time.LocalDateTime;
 
 class Blockchain extends Thread implements Serializable {
     ArrayList<Block> chain;
+    private float reward_per_block = 10;
     private ArrayList<Transaction> pendingTransactions;
     private ArrayList<Transaction> currently_mining;
     private int difficulty = 0;
     String ID;
     private String b_chain_broadcast;
     static boolean mineInterrupt = false;
+    static int transactions_per_block = 2;
 
-    public Blockchain(String ID, int diff, String broadcast_addr) throws NoSuchAlgorithmException, SocketException {
+    Blockchain(String ID, int diff, String broadcast_addr) throws NoSuchAlgorithmException, SocketException {
         this.ID = ID;
         this.b_chain_broadcast = broadcast_addr;
         chain = new ArrayList<>();
@@ -26,7 +28,10 @@ class Blockchain extends Thread implements Serializable {
     }
 
     private Block generateGenesisBlock() throws NoSuchAlgorithmException {
+        Transaction minerReward = new Transaction("Reward","Blockchain",this.ID);
+        minerReward.setAmount(reward_per_block);
         ArrayList<Transaction> genesis = new ArrayList<>();
+        genesis.add(minerReward);
         Block generate = new Block("null", pendingTransactions,"27/05/1999",0);
         generate.setPrevHash(null);
         generate.calcHash();
@@ -39,21 +44,25 @@ class Blockchain extends Thread implements Serializable {
     void start_mining() throws NoSuchAlgorithmException, InterruptedException, IOException {
         Blockchain.mineInterrupt = false;
         boolean flag = true;
-        int k = 4;
+        int k = Blockchain.transactions_per_block;
         currently_mining = new ArrayList<>();
         while(!MainRun.stopThread_mining){
             if (pendingTransactions.size() < k){
                 if (flag) {
-                    System.out.println("Waiting for transactions...");
+                    System.out.println("Waiting for transactions..."+ pendingTransactions.size());
                     flag = false;
                 }
-                Thread.sleep(1000);
+                Thread.sleep(3000);
             }
             else {
-                System.out.println(pendingTransactions.size());
+                //System.out.println(pendingTransactions.size());
                 for (int i=0;i<k;i++){
                     currently_mining.add(pendingTransactions.get(i));
                 }
+                //Get miner reward
+                Transaction minerReward = new Transaction("Reward","Blockchain",this.ID);
+                minerReward.setAmount(reward_per_block);
+                currently_mining.add(minerReward);
                 //Get current time
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
                 LocalDateTime now = LocalDateTime.now();
@@ -78,7 +87,6 @@ class Blockchain extends Thread implements Serializable {
         try {
             start_mining();
         } catch (NoSuchAlgorithmException | InterruptedException | IOException e) {
-            System.out.println("Here?? 82");
             e.printStackTrace();
         }
     }
@@ -98,13 +106,26 @@ class Blockchain extends Thread implements Serializable {
             prevTr.add(t.id);
         }
         for (Transaction t : nTr) {
+            if(t.id.equals("Reward")){
+                if (t.getAmount() != reward_per_block){
+                    return;
+                }
+            }
             newTr.add(t.id);
         }
 
         prevTr.retainAll(newTr);
-
+        if(prevTr.size()!=0){
+            for (String s:prevTr){
+                if (s.equals("Reward")){
+                    prevTr.remove(s);
+                    break;
+                }
+            }
+        }
         if (prevTr.size() != 0){// Check if previous block has some of the same transactions.
-            System.out.println(prevTr.size() + "Here?");
+            System.out.println(prevTr.get(0));
+            System.out.println(prevTr.size());
             System.out.println("Block Rejected! : Duplicate Transactions!");
         }
         else{
@@ -158,6 +179,26 @@ class Blockchain extends Thread implements Serializable {
             }
         }*/
         return true;
+    }
+
+    float getFunds(){
+        float funds = 0;
+        for(Block b: chain){
+            for (Transaction t: b.getTransactions()){
+                if (t.getToAddress().equals(this.ID)){
+                    funds += t.getAmount();
+                }
+                if (t.fromAddress.equals(this.ID)){
+                    funds -= t.getAmount();
+                }
+            }
+        }
+        for (Transaction t : pendingTransactions){
+            if (t.fromAddress.equals(this.ID)){
+                funds -= t.getAmount();
+            }
+        }
+        return funds;
     }
 }
 

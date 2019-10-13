@@ -10,7 +10,7 @@ public class MainRun {
     private static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
     public static boolean stopThread_mining = false;
     public static boolean mining_flag = false;
-    private int DIFFICULTY = 5;
+    private int DIFFICULTY = 2;
     private Blockchain b_chain;
     private ReceiveData server;
     private SendData sd;
@@ -123,7 +123,10 @@ public class MainRun {
         return mobj;
     }
 
+
+
     String makeTransaction() throws IOException { // Only for console TAG{CONSOLE}
+        float cash;
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter the Blockchain ID of recipient:");
         String SendTO = sc.nextLine();
@@ -139,8 +142,14 @@ public class MainRun {
                 tr.setHistory(create_medical_history());
                 break;
             case "3":
+                System.out.println("Your wallet:"+ b_chain.getFunds());
                 System.out.print("Enter amount:");
-                tr.setAmount(sc.nextFloat());
+                cash = sc.nextFloat();
+                if (b_chain.getFunds() >= cash) {tr.setAmount(cash);}
+                else{
+                    System.out.println("You don't have enough funds!");
+                    return "You don't have the required funds!";
+                }
                 break;
             default:
                 return "Cancelled";

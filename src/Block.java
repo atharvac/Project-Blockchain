@@ -24,16 +24,13 @@ class Block implements Serializable {
     // Import or implement hash function SHA256 or any other.
     // Returns a Hex Hash value
     String calcHash() throws NoSuchAlgorithmException {
-        String transaction_string = "";
+        StringBuilder transaction_string = new StringBuilder();
         for(Transaction t: transactions){
-            if(t.Header.equals("Money")){
-                transaction_string = transaction_string + t.getAmount() + t.getToAddress();
+            if ("Money".equals(t.Header)) {
+                transaction_string.append(t.getAmount()).append(t.getToAddress());
             }
-            else if(t.Header.equals("Object")){
-                transaction_string = transaction_string + t.getAmount() + t.Header + t.getToAddress();
-            }
-            else if(t.Header.equals("History")){
-                transaction_string = transaction_string + t.getAmount() + t.Header + t.getToAddress();
+            else {
+                transaction_string.append(t.getAmount()).append(t.Header).append(t.getToAddress());
             }
         }
 
@@ -67,32 +64,32 @@ class Block implements Serializable {
     String getCurrentHash(){
         return hash;
     }
-    public String getPrevHash(){
+    String getPrevHash(){
         return prevHash;
     }
-    public ArrayList<Transaction> getTransactions(){
+    ArrayList<Transaction> getTransactions(){
         return transactions;
     }
     public String getTime(){
         return time;
     }
 
-    public String getBlockId(){
+    String getBlockId(){
         return blockId;
     }
 
-    public void setPrevHash(String prevHash) {
+    void setPrevHash(String prevHash) {
         this.prevHash = prevHash;
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
         ArrayList<Transaction> a = new ArrayList<>();
-        Block b = new Block("", a, "12-09-19", 2);
+        Block b = new Block("", a, "12-09-19", 6);
         System.out.println(b.mineBlock());
         System.out.println(b.getCurrentHash());
         System.out.println(b.getBlockId());
         System.out.println("Nonce:"+b.nonce);
-        Block c = new Block(b.getCurrentHash(), a, "12-09-19", 2);
+        Block c = new Block(b.getCurrentHash(), a, "12-09-19", 6);
         System.out.println(c.mineBlock());
         System.out.println(c.getCurrentHash());
         System.out.println(c.getBlockId());
