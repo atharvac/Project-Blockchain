@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.Scanner;
+import java.util.*;
 
 public class MainRun {
     private static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
@@ -92,9 +92,20 @@ public class MainRun {
 
         // Extract data from string and put into array-list.
         System.out.println("Enter diseases (Separated by ','):");
+        String dummy = sc.nextLine();
         String _diseases = sc.nextLine();
-        System.out.println("Enter allergies (Separated by ',')");
+        String[] _disa = _diseases.split("[,]");
+        System.out.println("Enter allergies (Separated by ','):");
         String _allergies = sc.nextLine();
+        String[] alga = _allergies.split("[,]");
+
+        ArrayList<String> dis= new ArrayList<>();
+        ArrayList<String> all = new ArrayList<>();
+
+        Collections.addAll(dis, _disa);
+        Collections.addAll(all, alga);
+        mh.setALLERGIES(all);
+        mh.setDISEASES(dis);
         return mh;
     }
 
@@ -193,18 +204,5 @@ public class MainRun {
                     break;
             }
         }
-        /*
-        ArrayList<Transaction> test2= new ArrayList<>();
-        Block test = new Block(null, test2, "27/09/2019", 2);
-        MainRun m = new MainRun();
-        m.setup();
-        TransferData td = new TransferData(m.b_chain.ID, test);
-        System.out.println("\nClient:");
-        SendData sd = new SendData("localhost", 7777);
-        sd.broadcastData(td);
-        System.out.println("Size is:"+m.b_chain.chain.size());
-        m.exit();
-        */
-
     }
 }

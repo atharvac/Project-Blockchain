@@ -74,7 +74,7 @@ class Block implements Serializable {
         return time;
     }
 
-    String getBlockId(){
+    private String getBlockId(){
         return blockId;
     }
 
