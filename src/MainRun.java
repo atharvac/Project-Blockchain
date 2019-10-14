@@ -106,6 +106,11 @@ public class MainRun {
         Collections.addAll(all, alga);
         mh.setALLERGIES(all);
         mh.setDISEASES(dis);
+        try {
+            mh.store();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return mh;
     }
 

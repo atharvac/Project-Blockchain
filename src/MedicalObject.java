@@ -56,6 +56,7 @@ class MedicalObject implements Serializable {
                 stmt.execute(SQL);
             }
         }
+        stmt.close();
     }
 
     void getFromDB(String obj,String bg){
@@ -81,11 +82,15 @@ class MedicalHistory implements Serializable {
     int AGE;
     ArrayList<String> DISEASES;
     ArrayList<String> ALLERGIES;
+    String url;
+
     MedicalHistory(String name, String address, String bg, int age){
+        this.ID = (int) (Math.random() * 10000);
         this.NAME = name;
         this.ADDRESS = address;
         this.BLOODGROUP = bg;
         this.AGE = age;
+        url = "jdbc:sqlite:History.db";
     }
     void setDISEASES(ArrayList<String> d){
         DISEASES = d;
@@ -95,8 +100,24 @@ class MedicalHistory implements Serializable {
     }
     void setBG(String bg){ this.BLOODGROUP = bg; }
 
-    void store(){
-        return;
+    void store() throws SQLException {
+        Connection conn;
+        conn = DriverManager.getConnection(url);
+        Statement stmt = conn.createStatement();
+        String SQL, SQL1, SQL2;
+
+        SQL = "insert into history values("+ID+",'"+NAME+"',"+ "'"+ADDRESS+"',"+"(select ID from Blood where type='"+BLOODGROUP+"'));";
+        stmt.execute(SQL);
+
+        for (String st: DISEASES){
+            SQL1 = "insert into Diseases values("+ID+", '"+st+"');";
+            stmt.execute(SQL1);
+        }
+        for (String st: ALLERGIES){
+            SQL2 = "insert into Allergies values("+ID+", '"+st+"');";
+            stmt.execute(SQL2);
+        }
+        stmt.close();
     }
 
     void getFromDB(int id){
