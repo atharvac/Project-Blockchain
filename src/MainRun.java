@@ -1,4 +1,3 @@
-import com.sun.tools.javac.Main;
 
 import java.io.*;
 import java.net.SocketException;
@@ -7,11 +6,11 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class MainRun {
-    private static String BROADCAST_ADDRESS = "localhost"; //Set the current broadcast address
+    static String BROADCAST_ADDRESS = "192.168.43.255"; //Set the current broadcast address
     public static boolean stopThread_mining = false;
     public static boolean mining_flag = false;
-    private int DIFFICULTY = 2;
-    private Blockchain b_chain;
+    int DIFFICULTY = 0;
+    public Blockchain b_chain;
     private ReceiveData server;
     private SendData sd;
 
@@ -57,7 +56,7 @@ public class MainRun {
 
     }
 
-    private void exit() throws IOException {
+    void exit() throws IOException {
         sd = new SendData("localhost", 7777);
         try {
             sd.endBroadcast();
@@ -177,6 +176,11 @@ public class MainRun {
         return "Transaction from "+b_chain.ID + " to "+ SendTO + "Type -" + tr.Header;// Here goes Transaction Information.
     }
 
+
+    void makeTransaction_GUI(String trID) {
+        Transaction tr = new Transaction(String.valueOf((float) (Math.random() * 1000000)), b_chain.ID, trID);
+    }
+
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException { //{CONSOLE}
         boolean run = true;
         Scanner sc = new Scanner(System.in);
@@ -204,6 +208,7 @@ public class MainRun {
                     MainRun.stopThread_mining = true;
                     break;
                 default:
+                    m.b_chain.viewTrs();
                     m.exit();
                     run = false;
                     break;

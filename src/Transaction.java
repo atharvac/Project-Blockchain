@@ -7,8 +7,8 @@ class Transaction implements Serializable {
     private String digital_signature;
     String id;
     private float amount;
-    private MedicalObject object;
-    private MedicalHistory history;
+    MedicalObject object;
+    MedicalHistory history;
 
     Transaction(String id, String myAddr, String toAddr){
         this.id = id;

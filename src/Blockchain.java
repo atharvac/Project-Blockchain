@@ -11,7 +11,7 @@ class Blockchain extends Thread implements Serializable {
     private float reward_per_block = 10;
     private ArrayList<Transaction> pendingTransactions;
     private ArrayList<Transaction> currently_mining;
-    private int difficulty = 0;
+    int difficulty = 0;
     String ID;
     private String b_chain_broadcast;
     static boolean mineInterrupt = false;
@@ -49,6 +49,8 @@ class Blockchain extends Thread implements Serializable {
         while(!MainRun.stopThread_mining){
             if (pendingTransactions.size() < k){
                 if (flag) {
+                    String toNoti = "Waiting for transactions...  "+ pendingTransactions.size();
+                    NotificationGUI.model.addElement(toNoti);
                     System.out.println("Waiting for transactions..."+ pendingTransactions.size());
                     flag = false;
                 }
@@ -75,6 +77,8 @@ class Blockchain extends Thread implements Serializable {
                     SendData sd = new SendData(b_chain_broadcast, 7777);
                     sd.broadcastData(sendBlock);
                     validate_add_block(newBlock);
+                    String toNoti = "Block sent! ID:"+ newBlock.blockId;
+                    NotificationGUI.model.addElement(toNoti);
                     System.out.println("Block sent! ID:"+ newBlock.blockId);
                     currently_mining.clear();
                     break;
@@ -93,11 +97,15 @@ class Blockchain extends Thread implements Serializable {
 
     void validate_add_block(Block bk){
         if (!bk.getPrevHash().equals(chain.get(chain.size()-1).getCurrentHash())){// Check if new block slots on the blockchain
+            String toNoti = "Block Rejected! : Blockchain hash does not match!";
+            NotificationGUI.model.addElement(toNoti);
             System.out.println("Block Rejected! : Blockchain hash does not match!");
             return;
         }
         ArrayList<Transaction> pTr = chain.get(chain.size()-1).getTransactions();
         ArrayList<Transaction> nTr = bk.getTransactions();
+        String toNoti2 = "Blockchain Size:"+ chain.size();
+        NotificationGUI.model.addElement(toNoti2);
         System.out.println("Blockchain Size:"+ chain.size());
         ArrayList<String> prevTr = new ArrayList<>();
         ArrayList<String> newTr = new ArrayList<>();
@@ -126,10 +134,14 @@ class Blockchain extends Thread implements Serializable {
         if (prevTr.size() != 0){// Check if previous block has some of the same transactions.
             System.out.println(prevTr.get(0));
             System.out.println(prevTr.size());
+            String toNoti3 = "Block Rejected! : Duplicate Transactions!";
+            NotificationGUI.model.addElement(toNoti3);
             System.out.println("Block Rejected! : Duplicate Transactions!");
         }
         else{
             this.chain.add(bk);
+            String toNoti3 = "New block added to blockchain ID:"+ bk.blockId;
+            NotificationGUI.model.addElement(toNoti3);
             System.out.println("New block added to blockchain ID:"+ bk.blockId);
             for(Transaction t : pendingTransactions){
                 for (String s : newTr){
@@ -149,11 +161,15 @@ class Blockchain extends Thread implements Serializable {
     void validate_add_transaction(Transaction tr){
         for(Transaction t : pendingTransactions){
             if(t.id.equals(tr.id)){
+                String toNoti3 = "Duplicate transaction found!";
+                NotificationGUI.model.addElement(toNoti3);
                 System.out.println("Duplicate transaction found!");
                 return;
             }
         }
         pendingTransactions.add(tr);
+        String toNoti3 = "\nTransaction from: "+ tr.fromAddress+" Validated";
+        NotificationGUI.model.addElement(toNoti3);
         System.out.println("\nTransaction from: "+ tr.fromAddress+" Validated");
     }
 
@@ -200,5 +216,23 @@ class Blockchain extends Thread implements Serializable {
         }
         return funds;
     }
-}
 
+
+    void showObj(MedicalObject obj) {
+        if (obj!=null) {
+            String s = "Type: "+obj.TYPE+"Name: "+obj.NAME+"Quanity: "+obj.QUANTITY+"Amount: "+obj.AMOUNT;
+            System.out.println(s);
+        }
+    }
+
+    void viewTrs() {
+        for (Block b:chain) {
+            for (Transaction t:b.getTransactions()) {
+                System.out.println("From:"+t.fromAddress);
+                System.out.println("Type:"+t.Header);
+                System.out.println("To:"+t.getToAddress());
+                showObj(t.object);
+            }
+        }
+    }
+}

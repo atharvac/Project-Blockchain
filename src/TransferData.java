@@ -61,6 +61,8 @@ class SendData {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        String toNoti = "Broadcasting to: " + addr;
+        NotificationGUI.model.addElement(toNoti);
         System.out.println("Broadcasting to:"+ addr);
     }
 
@@ -76,7 +78,7 @@ class SendData {
         socketBroadcast.send(packet);// Send the packet
     }
 
-     void endBroadcast() throws IOException, NoSuchAlgorithmException {
+    void endBroadcast() throws IOException, NoSuchAlgorithmException {
         ArrayList<Transaction> a = new ArrayList<>();
         Block b = new Block("", a, "0-0-0", 0);
         b.blockId = "0";
@@ -99,6 +101,8 @@ class ReceiveData extends Thread {
         this.port = port;
         socket = new DatagramSocket(port);// Set port on socket
         this.b_chain = chain;
+        String toNoti = "Server is listening on port:" + port;
+        //NotificationGUI.model.addElement(toNoti);
         System.out.println("Server is listening on port:" + port);
 
     }

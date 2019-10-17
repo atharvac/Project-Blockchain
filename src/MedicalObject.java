@@ -52,7 +52,7 @@ class MedicalObject implements Serializable {
             }
             else{
                 SQL = "insert into Drugs values(null," +"'"+NAME+"',"+QUANTITY+");";
-                System.out.println(SQL);
+                //System.out.println(SQL);
                 stmt.execute(SQL);
             }
         }
