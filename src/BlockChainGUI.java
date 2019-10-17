@@ -71,8 +71,8 @@ public class BlockChainGUI {
         frame.setBounds(150, 0,1250, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        NotificationGUI frame1 = new NotificationGUI();
-        frame1.setVisible(true);
+        //NotificationGUI frame1 = new NotificationGUI();
+        //frame1.setVisible(true);
 
         JButton btnNewButton = new JButton("Create Transaction");
         btnNewButton.addActionListener(new ActionListener() {
