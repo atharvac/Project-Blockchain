@@ -115,8 +115,12 @@ public class MedicalObjectGUI extends JFrame {
                 StaticVars.ftt = Float.valueOf(Funds.getText());
                 StaticVars.bg2 = BloodType.getText();
                 StaticVars.name2 = nameF.getText();
-
+                if (BlockChainGUI.m.b_chain.getFunds() < StaticVars.ftt) {
+                    StaticVars.ftt = 0;
+                    NotificationGUI.model.addElement("Insufficient funds! None will be sent.");
+                }
                 MedicalObject obj = new MedicalObject(StaticVars.OD, StaticVars.name2, StaticVars.quantity, StaticVars.ftt);
+
                 try {
                     obj.setBloodType(StaticVars.bg2);
                     obj.store();
