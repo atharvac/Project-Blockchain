@@ -225,6 +225,15 @@ class Blockchain extends Thread implements Serializable {
         }
     }
 
+    void showHis (MedicalHistory his){
+        if (his!=null){
+            String s = "\nName:"+his.NAME+"\nAddress:"+his.ADDRESS+"\nBloodGroup:"+his.BLOODGROUP+"\nAge:"+his.AGE+
+                       "\nDiseases:\n"+his.DISEASES+"\nAllergies:\n"+his.ALLERGIES;
+            System.out.println(s);
+        }
+
+    }
+
     void viewTrs() {
         for (Block b:chain) {
             for (Transaction t:b.getTransactions()) {
@@ -232,6 +241,7 @@ class Blockchain extends Thread implements Serializable {
                 System.out.println("Type:"+t.Header);
                 System.out.println("To:"+t.getToAddress());
                 showObj(t.object);
+                showHis(t.history);
             }
         }
     }
