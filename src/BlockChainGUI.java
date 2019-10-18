@@ -140,8 +140,8 @@ public class BlockChainGUI {
         frame.getContentPane().add(button);
 
         JLabel lblNewLabel = new JLabel("");
-        lblNewLabel.setIcon(new ImageIcon("src/Images/logo2.png"));
-        lblNewLabel.setBounds(142, 130, 1461, 480);
+        lblNewLabel.setIcon(new ImageIcon("C:\\Users\\ashus\\git\\Project-Blockchain2\\Images\\logo with line.png"));
+        lblNewLabel.setBounds(131, 137, 1461, 480);
         frame.getContentPane().add(lblNewLabel);
 
         JLabel lblMedi = new JLabel("Medi");
@@ -169,6 +169,12 @@ public class BlockChainGUI {
         btnConsole.setBackground(Color.WHITE);
         btnConsole.setBounds(23, 684, 116, 45);
         frame.getContentPane().add(btnConsole);
+
+        JLabel label = new JLabel("ID: " + m.b_chain.ID);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        label.setBounds(373, 507, 196, 32);
+        frame.getContentPane().add(label);
 
         JMenuBar menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
