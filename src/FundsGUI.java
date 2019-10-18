@@ -61,12 +61,12 @@ public class FundsGUI extends JFrame {
         contentPane.add(label_1);
 
         JLabel logofunds = new JLabel("");
-        logofunds.setIcon(new ImageIcon("src/Images/logo2.png"));
+        logofunds.setIcon(new ImageIcon("C:\\Users\\ashus\\git\\Project-Blockchain2\\Images\\logo element.png"));
         logofunds.setBounds(-42, -55, 338, 260);
         contentPane.add(logofunds);
 
         JLabel lblFunds = new JLabel("FUNDS");
-        lblFunds.setForeground(new Color(238, 156, 0));
+        lblFunds.setForeground(new Color(204, 0, 51));
         lblFunds.setFont(new Font("Tahoma", Font.PLAIN, 40));
         lblFunds.setBackground(new Color(153, 0, 51));
         lblFunds.setBounds(529, 201, 348, 59);
@@ -131,12 +131,6 @@ public class FundsGUI extends JFrame {
         button.setBackground(Color.WHITE);
         button.setBounds(525, 504, 116, 32);
         contentPane.add(button);
-
-        JLabel lblTransactionFrom = new JLabel("TRANSACTION FROM :");
-        lblTransactionFrom.setForeground(Color.WHITE);
-        lblTransactionFrom.setFont(new Font("Tahoma", Font.PLAIN, 18));
-        lblTransactionFrom.setBounds(353, 610, 288, 32);
-        contentPane.add(lblTransactionFrom);
 
         JButton btnBack = new JButton("BACK");
         btnBack.addActionListener(new ActionListener() {

@@ -140,7 +140,7 @@ public class BlockChainGUI {
         frame.getContentPane().add(button);
 
         JLabel lblNewLabel = new JLabel("");
-        lblNewLabel.setIcon(new ImageIcon("C:\\Users\\ashus\\git\\Project-Blockchain2\\Images\\logo with line.png"));
+        lblNewLabel.setIcon(new ImageIcon("src/Images/logo2.png"));
         lblNewLabel.setBounds(131, 137, 1461, 480);
         frame.getContentPane().add(lblNewLabel);
 
