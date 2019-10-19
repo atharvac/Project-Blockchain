@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 class Block implements Serializable {
     String blockId;
-    private String hash;
+    String hash;
     private String prevHash;
     private ArrayList<Transaction> transactions;
     private String time;

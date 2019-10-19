@@ -58,8 +58,8 @@ public class NotificationGUI extends JFrame {
         contentPane.add(list_1);
 
         JLabel label = new JLabel("");
-        label.setIcon(new ImageIcon("C:\\Users\\ashus\\git\\Project-Blockchain2\\Images\\logo with line.png"));
-        label.setBounds(-143, -40, 1461, 480);
+        label.setIcon(new ImageIcon("src/Images/logol.png"));
+        label.setBounds(-160, -40, 1261, 480);
         contentPane.add(label);
 
         JLabel label_1 = new JLabel("Medi");

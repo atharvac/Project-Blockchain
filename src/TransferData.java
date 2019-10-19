@@ -154,6 +154,7 @@ class ReceiveData extends Thread {
                 System.out.println("Exception" + e);
             }
         }
+        System.out.println("Closed");
         socket.close();
     }
 

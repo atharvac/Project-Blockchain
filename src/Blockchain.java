@@ -34,7 +34,7 @@ class Blockchain extends Thread implements Serializable {
         genesis.add(minerReward);
         Block generate = new Block("null", pendingTransactions,"27/05/1999",0);
         generate.setPrevHash(null);
-        generate.calcHash();
+        generate.hash = "";
         return generate;
     }
     void setDifficulty(int diff){
